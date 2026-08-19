@@ -10,7 +10,7 @@ const EVENT = {
 
 // Web-App-URL des Apps Script (/exec). Leer = Testbetrieb mit DEMO_ITEMS,
 // dann zählt nur dieser Browser mit und nichts wird gespeichert.
-const ENDPOINT = '';
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbwpiKI0KTew2TdgcO1_k4WA1-syOZBT309YuQTD4ibTVxJvJa4UPaV-6vRhhEE4tAdU/exec';
 
 const CHOICE_TITLE = 'Was bringst du mit?';
 const CHOICE_MODE = 'multi'; // 'single' = nur eine Antwort
