@@ -64,7 +64,7 @@
         if (!url) return ($('#status').textContent = 'Bitte die Web-App-URL eintragen.');
         $('#status').textContent = 'Lädt …';
         try {
-          const res = await jsonp(url + '?token=' + encodeURIComponent(token));
+          const res = await jsonp(url + '?action=export&token=' + encodeURIComponent(token));
           if (!res.ok) throw new Error(res.error === 'token' ? 'Token stimmt nicht.' : res.error);
           rows = res.rows || [];
           $('#status').textContent = `${Math.max(0, rows.length - 1)} Anmeldungen geladen.`;
