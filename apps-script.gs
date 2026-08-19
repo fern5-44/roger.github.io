@@ -3,7 +3,7 @@
    Nach JEDER Änderung eine neue Bereitstellung erzeugen. */
 
 const SHEET_NAME = 'Anmeldungen';
-const TOKEN = 'aendere-mich'; // nur für den Export in admin.html
+const TOKEN = '544061287'; // nur für den Export in admin.html
 
 /* Die Kontingente gehören hierher, nicht ins JavaScript der Seite:
    dort könnte sie jeder in der Konsole hochsetzen.
