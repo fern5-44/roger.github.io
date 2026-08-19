@@ -1,0 +1,165 @@
+/* Absichtlich karg – Gestaltung ist deine Baustelle. */
+
+:root {
+  --ink: #16181d;
+  --muted: #6b7078;
+  --paper: #fff;
+  --line: #d9dbe0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font: 16px/1.5 system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+main {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+h1 {
+  margin: 0 0 4px;
+}
+
+#meta,
+#progress {
+  color: var(--muted);
+}
+
+fieldset {
+  border: 0;
+  margin: 24px 0 0;
+  padding: 0;
+}
+
+legend {
+  font-size: 1.25rem;
+  font-weight: 600;
+  padding: 0;
+  margin-bottom: 12px;
+}
+
+label {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.opt {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  font: inherit;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+/* Auswahl in Schritt 2 */
+.choice {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.choice input {
+  width: auto;
+  margin: 2px 0 0;
+  flex: none;
+}
+
+.choice small {
+  display: block;
+  color: var(--muted);
+}
+
+.choice:has(input:checked) {
+  border-color: var(--ink);
+}
+
+button {
+  font: inherit;
+  padding: 11px 18px;
+  border: 1px solid var(--ink);
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+}
+
+/* sekundäre Aktionen */
+button[data-back],
+#download,
+#share,
+#load {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.nav {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+#error:empty {
+  display: none;
+}
+
+#error {
+  color: #b3261e;
+}
+
+/* Canvas ist 1080 px breit – hier skalieren, nicht die Canvas-Größe ändern,
+   sonst wird das heruntergeladene Bild klein. */
+#ticket {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+}
+
+/* Admin-Vorschau */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-top: 20px;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  padding: 7px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  white-space: nowrap;
+}
+
+[hidden] {
+  display: none !important;
+}
