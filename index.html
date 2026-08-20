@@ -1,79 +1,118 @@
-<!doctype html>
-<html lang="de">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Anmeldung</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <main>
-      <h1 id="title"></h1>
-      <p id="meta"></p>
+<!-- Schritt 0 ------------------------------------------------ -->
+<fieldset data-step="0">
+  <legend>Ich bin kein Roboter.</legend>
 
-      <p id="progress" aria-live="polite"></p>
-      <p id="status" role="status"></p>
+  <p>Beantworte alle drei Fragen richtig, um fortzufahren.</p>
 
-      <form id="rsvp" novalidate>
-        <!-- Schritt 1 ------------------------------------------------ -->
-        <fieldset data-step="0">
-          <legend>Wer kommt?</legend>
-          <p>
-            <label for="name">Name</label>
-            <input id="name" name="name" type="text" autocomplete="name" required />
-          </p>
-          <p>
-            <label for="email">E-Mail <span class="opt">(optional)</span></label>
-            <input id="email" name="email" type="email" autocomplete="email" />
-          </p>
-          <p class="nav">
-            <button type="button" data-next>Weiter</button>
-          </p>
-        </fieldset>
+  <!-- Frage 1 -->
+  <fieldset class="question">
+    <legend>Frage 1</legend>
 
-        <!-- Schritt 2 ------------------------------------------------
-             Die Auswahl wird aus OPTIONS in app.js gebaut. -->
-        <fieldset data-step="1" hidden>
-          <legend id="choice-title"></legend>
-          <!-- wird aus dem Serverbestand gebaut, siehe renderChoices() in app.js -->
-          <div id="choices"></div>
-          <p class="nav">
-            <button type="button" data-back>Zurück</button>
-            <button type="button" data-next>Weiter</button>
-          </p>
-        </fieldset>
+    <label>
+      <input type="radio" name="question1" value="a" required />
+      Antwort A
+    </label>
 
-        <!-- Schritt 3 ------------------------------------------------ -->
-        <fieldset data-step="2" hidden>
-          <legend>Noch etwas?</legend>
-          <p>
-            <label for="remarks">Bemerkungen <span class="opt">(optional)</span></label>
-            <!-- maxlength, weil die Anmeldung über die URL geht (JSONP) -->
-            <textarea id="remarks" name="remarks" rows="5" maxlength="400"></textarea>
-          </p>
-          <p class="nav">
-            <button type="button" data-back>Zurück</button>
-            <button type="submit">Anmeldung abschicken</button>
-          </p>
-        </fieldset>
+    <label>
+      <input type="radio" name="question1" value="b" />
+      Antwort B
+    </label>
 
-        <p id="error" role="alert"></p>
-      </form>
+    <label>
+      <input type="radio" name="question1" value="c" />
+      Antwort C
+    </label>
 
-      <!-- Nach dem Absenden -->
-      <section id="step-done" hidden>
-        <h2>Angemeldet</h2>
-        <canvas id="ticket" width="1080" height="1350" role="img" aria-label="Einladungskarte"></canvas>
-        <p>
-          <button type="button" id="download">Bild herunterladen</button>
-          <button type="button" id="share" hidden>Teilen</button>
-         <a class="btn" target="_blank" rel="noopener"
-   href="https://raw.githubusercontent.com/fern5-44/roger.github.io/refs/heads/main/Meine_Termine.ics" download>
-  Termin in Kalender eintragen
-</a>
-      </section>
-    </main>
+    <label>
+      <input type="radio" name="question1" value="d" />
+      Antwort D
+    </label>
+  </fieldset>
 
-    <script src="app.js"></script>
-  </body>
-</html>
+  <!-- Frage 2 -->
+  <fieldset class="question">
+    <legend>Frage 2</legend>
+
+    <label>
+      <input type="radio" name="question2" value="a" required />
+      Antwort A
+    </label>
+
+    <label>
+      <input type="radio" name="question2" value="b" />
+      Antwort B
+    </label>
+
+    <label>
+      <input type="radio" name="question2" value="c" />
+      Antwort C
+    </label>
+
+    <label>
+      <input type="radio" name="question2" value="d" />
+      Antwort D
+    </label>
+  </fieldset>
+
+  <!-- Frage 3 -->
+  <fieldset class="question">
+    <legend>Frage 3</legend>
+
+    <label>
+      <input type="radio" name="question3" value="a" required />
+      Antwort A
+    </label>
+
+    <label>
+      <input type="radio" name="question3" value="b" />
+      Antwort B
+    </label>
+
+    <label>
+      <input type="radio" name="question3" value="c" />
+      Antwort C
+    </label>
+
+    <label>
+      <input type="radio" name="question3" value="d" />
+      Antwort D
+    </label>
+  </fieldset>
+
+  <p class="nav">
+    <button type="button" data-next>Weiter</button>
+  </p>
+</fieldset>
+
+<!-- Schritt 1 ------------------------------------------------ -->
+<fieldset data-step="1" hidden>
+  <legend>Bist du dabei?</legend>
+
+  <p>
+    <label for="name">Name</label>
+    <input
+      id="name"
+      name="name"
+      type="text"
+      autocomplete="name"
+      required
+    />
+  </p>
+
+  <p>
+    <label for="email">
+      E-Mail <span class="opt">(optional)</span>
+    </label>
+    <input
+      id="email"
+      name="email"
+      type="email"
+      autocomplete="email"
+    />
+  </p>
+
+  <p class="nav">
+    <button type="button" data-back>Zurück</button>
+    <button type="button" data-next>Weiter</button>
+  </p>
+</fieldset>
