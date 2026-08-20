@@ -1,116 +1,472 @@
-<!-- Schritt 0 ------------------------------------------------ -->
-<fieldset data-step="0">
-  <legend>Ich bin kein Roboter.</legend>
+<!doctype html>
+<html lang="de">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Anmeldung</title>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
 
 
+<body>
 
-  <p>Beantworte alle drei Fragen richtig, um weiterzukommen.</p>
+  <main>
 
-  <fieldset class="question">
-    <legend>Frage 1: Wie alt werde ich?</legend>
+    <!-- =====================================================
+         KOPF
+         ===================================================== -->
 
-    <label>
-      <input type="radio" name="question1" value="10011" required />
-      10011
-    </label>
+    <h1 id="title"></h1>
 
-    <label>
-      <input type="radio" name="question1" value="1111" />
-      1111
-    </label>
+    <p id="meta"></p>
 
-    <label>
-      <input type="radio" name="question1" value="11111" />
-      11111
-    </label>
+    <p
+      id="progress"
+      aria-live="polite">
+    </p>
 
-    <label>
-      <input type="radio" name="question1" value="10101" />
-      10101
-    </label>
-  </fieldset>
+    <p
+      id="status"
+      role="status">
+    </p>
 
-  <fieldset class="question">
-    <legend>Frage 2: Welche Zutat kommt nicht auf eine Pizza?</legend>
 
-    <label>
-      <input type="radio" name="question2" value="salami" required />
-      Salami
-    </label>
+    <!-- =====================================================
+         FORMULAR
+         ===================================================== -->
 
-    <label>
-      <input type="radio" name="question2" value="banane" />
-      Banane
-    </label>
+    <form
+      id="rsvp"
+      novalidate>
 
-    <label>
-      <input type="radio" name="question2" value="ananas" />
-      Ananas
-    </label>
 
-    <label>
-      <input type="radio" name="question2" value="olive" />
-      Olive
-    </label>
-  </fieldset>
+      <!-- ===================================================
+           SCHRITT 0 – SICHERHEITSFRAGEN
+           =================================================== -->
 
-  <fieldset class="question">
-    <legend>Frage 3: Was sind meine Lieblingsblumen?</legend>
+      <fieldset data-step="0">
 
-    <label>
-      <input type="radio" name="question3" value="rosen-tulpen" required />
-      Rosen &amp; Tulpen
-    </label>
+        <legend>
+          Ich bin kein Roboter.
+        </legend>
 
-    <label>
-      <input type="radio" name="question3" value="gaensebluemchen" />
-      Gänseblümchen &amp; Vergissmeinnicht
-    </label>
 
-    <label>
-      <input type="radio" name="question3" value="ranunkeln-chrysanthemen" />
-      Ranunkeln &amp; Chrysanthemen
-    </label>
+        <p>
+          Beantworte alle drei Fragen richtig,
+          um weiterzukommen.
+        </p>
 
-    <label>
-      <input type="radio" name="question3" value="sonnenblumen" />
-      Sonnenblumen
-    </label>
-  </fieldset>
 
-  <p class="nav">
-    <button type="button" data-next>Weiter</button>
-  </p>
-</fieldset>
-<!-- Schritt 1 ------------------------------------------------ -->
-<fieldset data-step="1" hidden>
-  <legend>Bist du dabei?</legend>
+        <!-- Frage 1 ----------------------------------------- -->
 
-  <p>
-    <label for="name">Name</label>
-    <input
-      id="name"
-      name="name"
-      type="text"
-      autocomplete="name"
-      required
-    />
-  </p>
+        <fieldset class="question">
 
-  <p>
-    <label for="email">
-      E-Mail <span class="opt">(optional)</span>
-    </label>
-    <input
-      id="email"
-      name="email"
-      type="email"
-      autocomplete="email"
-    />
-  </p>
+          <legend>
+            Frage 1: Wie alt werde ich?
+          </legend>
 
-  <p class="nav">
-    <button type="button" data-back>Zurück</button>
-    <button type="button" data-next>Weiter</button>
-  </p>
-</fieldset>
+
+          <label>
+            <input
+              type="radio"
+              name="question1"
+              value="10011"
+            />
+            10011
+          </label>
+
+
+          <label>
+            <input
+              type="radio"
+              name="question1"
+              value="1111"
+            />
+            1111
+          </label>
+
+
+          <label>
+            <input
+              type="radio"
+              name="question1"
+              value="11111"
+            />
+            11111
+          </label>
+
+
+          <label>
+            <input
+              type="radio"
+              name="question1"
+              value="10101"
+            />
+            10101
+          </label>
+
+        </fieldset>
+
+
+        <!-- Frage 2 ----------------------------------------- -->
+
+        <fieldset class="question">
+
+          <legend>
+            Frage 2: Welche Zutat kommt nicht auf eine Pizza?
+          </legend>
+
+
+          <label>
+            <input
+              type="radio"
+              name="question2"
+              value="salami"
+            />
+            Salami
+          </label>
+
+
+          <label>
+            <input
+              type="radio"
+              name="question2"
+              value="banane"
+            />
+            Banane
+          </label>
+
+
+          <label>
+            <input
+              type="radio"
+              name="question2"
+              value="ananas"
+            />
+            Ananas
+          </label>
+
+
+          <label>
+            <input
+              type="radio"
+              name="question2"
+              value="olive"
+            />
+            Olive
+          </label>
+
+        </fieldset>
+
+
+        <!-- Frage 3 ----------------------------------------- -->
+
+        <fieldset class="question">
+
+          <legend>
+            Frage 3: Was sind meine Lieblingsblumen?
+          </legend>
+
+
+          <label>
+            <input
+              type="radio"
+              name="question3"
+              value="rosen-tulpen"
+            />
+            Rosen &amp; Tulpen
+          </label>
+
+
+          <label>
+            <input
+              type="radio"
+              name="question3"
+              value="gaensebluemchen"
+            />
+            Gänseblümchen &amp; Vergissmeinnicht
+          </label>
+
+
+          <label>
+            <input
+              type="radio"
+              name="question3"
+              value="ranunkeln-chrysanthemen"
+            />
+            Ranunkeln &amp; Chrysanthemen
+          </label>
+
+
+          <label>
+            <input
+              type="radio"
+              name="question3"
+              value="sonnenblumen"
+            />
+            Sonnenblumen
+          </label>
+
+        </fieldset>
+
+
+        <!-- Weiter ------------------------------------------ -->
+
+        <p class="nav">
+
+          <button
+            type="button"
+            data-next>
+            Weiter
+          </button>
+
+        </p>
+
+      </fieldset>
+
+
+      <!-- ===================================================
+           SCHRITT 1 – ANMELDUNG
+           =================================================== -->
+
+      <fieldset
+        data-step="1"
+        hidden>
+
+        <legend>
+          Bist du dabei?
+        </legend>
+
+
+        <p>
+
+          <label for="name">
+            Name
+          </label>
+
+          <input
+            id="name"
+            name="name"
+            type="text"
+            autocomplete="name"
+            required
+          />
+
+        </p>
+
+
+        <p>
+
+          <label for="email">
+
+            E-Mail
+
+            <span class="opt">
+              (optional)
+            </span>
+
+          </label>
+
+
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="email"
+          />
+
+        </p>
+
+
+        <p class="nav">
+
+          <button
+            type="button"
+            data-back>
+            Zurück
+          </button>
+
+
+          <button
+            type="button"
+            data-next>
+            Weiter
+          </button>
+
+        </p>
+
+      </fieldset>
+
+
+      <!-- ===================================================
+           SCHRITT 2 – MITBRINGEN
+           =================================================== -->
+
+      <fieldset
+        data-step="2"
+        hidden>
+
+        <legend id="choice-title"></legend>
+
+
+        <div id="choices"></div>
+
+
+        <p class="nav">
+
+          <button
+            type="button"
+            data-back>
+            Zurück
+          </button>
+
+
+          <button
+            type="button"
+            data-next>
+            Weiter
+          </button>
+
+        </p>
+
+      </fieldset>
+
+
+      <!-- ===================================================
+           SCHRITT 3 – BEMERKUNGEN
+           =================================================== -->
+
+      <fieldset
+        data-step="3"
+        hidden>
+
+        <legend>
+          Noch etwas?
+        </legend>
+
+
+        <p>
+
+          <label for="remarks">
+
+            Bemerkungen
+
+            <span class="opt">
+              (optional)
+            </span>
+
+          </label>
+
+
+          <textarea
+            id="remarks"
+            name="remarks"
+            rows="5"
+            maxlength="400"></textarea>
+
+        </p>
+
+
+        <p class="nav">
+
+          <button
+            type="button"
+            data-back>
+            Zurück
+          </button>
+
+
+          <button
+            type="submit">
+            Anmeldung abschicken
+          </button>
+
+        </p>
+
+      </fieldset>
+
+
+      <!-- ===================================================
+           FEHLER
+           =================================================== -->
+
+      <p
+        id="error"
+        role="alert">
+      </p>
+
+
+    </form>
+
+
+    <!-- =====================================================
+         NACH DEM ABSENDEN
+         ===================================================== -->
+
+    <section
+      id="step-done"
+      hidden>
+
+
+      <h2>
+        Angemeldet
+      </h2>
+
+
+      <canvas
+        id="ticket"
+        width="1080"
+        height="1350"
+        role="img"
+        aria-label="Einladungskarte">
+      </canvas>
+
+
+      <p>
+
+
+        <button
+          type="button"
+          id="download">
+          Bild herunterladen
+        </button>
+
+
+        <button
+          type="button"
+          id="share"
+          hidden>
+          Teilen
+        </button>
+
+
+        <a
+          class="btn"
+          target="_blank"
+          rel="noopener"
+          href="https://raw.githubusercontent.com/fern5-44/roger.github.io/refs/heads/main/Meine_Termine.ics"
+          download>
+          Termin in Kalender eintragen
+        </a>
+
+
+      </p>
+
+    </section>
+
+
+  </main>
+
+
+  <!-- =====================================================
+       JAVASCRIPT
+       ===================================================== -->
+
+  <script src="app.js"></script>
+
+</body>
+
+</html>
