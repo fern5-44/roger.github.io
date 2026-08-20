@@ -2,10 +2,10 @@
    Alles mit TODO ist deine Baustelle. */
 
 const EVENT = {
-  title: 'Mein 30. Geburtstag',
-  date: 'Sa, 26. September 2026',
+  title: 'Särli feiert Geburtstag',
+  date: 'Sa, Januar 2027',
   time: '19:00 Uhr',
-  place: 'Gartenhaus Lindenhof, Lindenweg 7',
+  place: 'Gartenhaus',
 };
 
 // Web-App-URL des Apps Script (/exec). Leer = Testbetrieb mit DEMO_ITEMS,
