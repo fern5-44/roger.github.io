@@ -113,7 +113,7 @@ function labelsFor(ids) {
 /* ---------- Sicherheitsfragen ---------- */
 
 const SECURITY_ANSWERS = {
-  question1: '10011', // 19 in Binär
+  question1: '10011',        // 19 in Binär
   question2: 'salami',
   question3: 'gaensebluemchen'
 };
@@ -128,66 +128,106 @@ function validateSecurityQuestions() {
   }
 
   if (q1.value !== SECURITY_ANSWERS.question1) {
-    return 'Frage 1 ist leider falsch. Versuch es nochmal.';
+    return 'Frage 1 ist falsch. Versuch es noch einmal.';
   }
 
   if (q2.value !== SECURITY_ANSWERS.question2) {
-    return 'Frage 2 ist leider falsch. Versuch es nochmal.';
+    return 'Frage 2 ist falsch. Versuch es noch einmal.';
   }
 
   if (q3.value !== SECURITY_ANSWERS.question3) {
-    return 'Frage 3 ist leider falsch. Versuch es nochmal.';
+    return 'Frage 3 ist falsch. Versuch es noch einmal.';
   }
 
   return null;
 }
+
 
 /* ---------- Schritte ---------- */
 
 let step = 0;
 
 function show(i) {
+  // Sicherheitscheck: Schritt muss existieren
+  if (i < 0 || i >= stepEls.length) return;
+
   step = i;
-  stepEls.forEach((el, n) => (el.hidden = n !== i));
-  $('#progress').textContent = `Schritt ${i + 1} von ${stepEls.length}`;
+
+  stepEls.forEach((el, index) => {
+    el.hidden = index !== i;
+  });
+
+  $('#progress').textContent =
+    `Schritt ${i + 1} von ${stepEls.length}`;
+
   error('');
 
-  // Bestand bei jedem Betreten frisch holen – zwischenzeitlich kann etwas weg sein.
-  if (i === 2) loadStock();
+  // Auswahl erst bei Schritt 3 laden
+  if (i === 2) {
+    loadStock();
+  }
 
-  const first = stepEls[i].querySelector('input, textarea, select');
-  if (first) first.focus();
+  const first = stepEls[i].querySelector(
+    'input:not([type="radio"]):not([type="checkbox"]), textarea, select'
+  );
+
+  if (first) {
+    first.focus();
+  }
 }
+
 
 function error(msg) {
   $('#error').textContent = msg;
 }
 
+
 function status(msg) {
   $('#status').textContent = msg;
 }
 
+
+/* ---------- Weiter / Zurück ---------- */
+
 form.addEventListener('click', (e) => {
-  if (e.target.matches('[data-next]')) {
+
+  const nextButton = e.target.closest('[data-next]');
+  const backButton = e.target.closest('[data-back]');
+
+  if (nextButton) {
     const problem = validate(step);
-    if (problem) return error(problem);
+
+    if (problem) {
+      error(problem);
+      return;
+    }
+
     show(step + 1);
+    return;
   }
 
-  if (e.target.matches('[data-back]')) {
+  if (backButton) {
     show(step - 1);
   }
 });
 
+
+/* ---------- Validierung ---------- */
+
 function validate(i) {
-  // Schritt 0 = Sicherheitsfragen
+
+  // Schritt 0: Sicherheitsfragen
   if (i === 0) {
     return validateSecurityQuestions();
   }
 
-  // Schritt 1 = Name + E-Mail
+
+  // Schritt 1: Name + E-Mail
   if (i === 1) {
-    if (!$('#name').value.trim()) {
+
+    const name = $('#name').value.trim();
+
+    if (!name) {
       return 'Bitte den Namen eintragen.';
     }
 
@@ -196,23 +236,37 @@ function validate(i) {
     if (mail && !$('#email').checkValidity()) {
       return 'Diese E-Mail-Adresse sieht unvollständig aus.';
     }
+
+    return null;
   }
 
-  // Schritt 2 = Mitbringen
-  if (
-    i === 2 &&
-    CHOICE_REQUIRED &&
-    items.some((x) => x.left === null || x.left > 0) &&
-    !getChoices().length
-  ) {
-    return 'Bitte mindestens eine Option wählen.';
+
+  // Schritt 2: Auswahl
+  if (i === 2) {
+
+    const available = items.some(
+      (x) => x.left === null || x.left > 0
+    );
+
+    if (
+      CHOICE_REQUIRED &&
+      available &&
+      !getChoices().length
+    ) {
+      return 'Bitte mindestens eine Option wählen.';
+    }
+
+    return null;
   }
+
 
   return null;
 }
 
-show(0);
 
+/* ---------- Start ---------- */
+
+show(0);
 /* ---------- Absenden ---------- */
 
 form.addEventListener('submit', async (e) => {
