@@ -110,6 +110,38 @@ function labelsFor(ids) {
   return ids.map((id) => (items.find((i) => i.id === id) || { label: id }).label).join('; ');
 }
 
+/* ---------- Sicherheitsfragen ---------- */
+
+const SECURITY_ANSWERS = {
+  question1: '10011', // 19 in Binär
+  question2: 'salami',
+  question3: 'gaensebluemchen'
+};
+
+function validateSecurityQuestions() {
+  const q1 = form.querySelector('input[name="question1"]:checked');
+  const q2 = form.querySelector('input[name="question2"]:checked');
+  const q3 = form.querySelector('input[name="question3"]:checked');
+
+  if (!q1 || !q2 || !q3) {
+    return 'Bitte beantworte alle drei Fragen.';
+  }
+
+  if (q1.value !== SECURITY_ANSWERS.question1) {
+    return 'Frage 1 ist leider falsch. Versuch es nochmal.';
+  }
+
+  if (q2.value !== SECURITY_ANSWERS.question2) {
+    return 'Frage 2 ist leider falsch. Versuch es nochmal.';
+  }
+
+  if (q3.value !== SECURITY_ANSWERS.question3) {
+    return 'Frage 3 ist leider falsch. Versuch es nochmal.';
+  }
+
+  return null;
+}
+
 /* ---------- Schritte ---------- */
 
 let step = 0;
@@ -119,8 +151,10 @@ function show(i) {
   stepEls.forEach((el, n) => (el.hidden = n !== i));
   $('#progress').textContent = `Schritt ${i + 1} von ${stepEls.length}`;
   error('');
+
   // Bestand bei jedem Betreten frisch holen – zwischenzeitlich kann etwas weg sein.
-  if (i === 1) loadStock();
+  if (i === 2) loadStock();
+
   const first = stepEls[i].querySelector('input, textarea, select');
   if (first) first.focus();
 }
@@ -128,6 +162,7 @@ function show(i) {
 function error(msg) {
   $('#error').textContent = msg;
 }
+
 function status(msg) {
   $('#status').textContent = msg;
 }
@@ -138,19 +173,42 @@ form.addEventListener('click', (e) => {
     if (problem) return error(problem);
     show(step + 1);
   }
-  if (e.target.matches('[data-back]')) show(step - 1);
+
+  if (e.target.matches('[data-back]')) {
+    show(step - 1);
+  }
 });
 
 function validate(i) {
+  // Schritt 0 = Sicherheitsfragen
   if (i === 0) {
-    if (!$('#name').value.trim()) return 'Bitte den Namen eintragen.';
-    const mail = $('#email').value.trim();
-    if (mail && !$('#email').checkValidity()) return 'Diese E-Mail-Adresse sieht unvollständig aus.';
+    return validateSecurityQuestions();
   }
-  if (i === 1 && CHOICE_REQUIRED && items.some((x) => x.left === null || x.left > 0) && !getChoices().length) {
+
+  // Schritt 1 = Name + E-Mail
+  if (i === 1) {
+    if (!$('#name').value.trim()) {
+      return 'Bitte den Namen eintragen.';
+    }
+
+    const mail = $('#email').value.trim();
+
+    if (mail && !$('#email').checkValidity()) {
+      return 'Diese E-Mail-Adresse sieht unvollständig aus.';
+    }
+  }
+
+  // Schritt 2 = Mitbringen
+  if (
+    i === 2 &&
+    CHOICE_REQUIRED &&
+    items.some((x) => x.left === null || x.left > 0) &&
+    !getChoices().length
+  ) {
     return 'Bitte mindestens eine Option wählen.';
   }
-  return null; // TODO: eigene Regeln
+
+  return null;
 }
 
 show(0);
