@@ -26,6 +26,8 @@ const CHOICE_TITLE = 'Was bringst du mit?';
 const CHOICE_MODE = 'multi';
 const CHOICE_REQUIRED = true;
 
+
+// Nur für den Testbetrieb
 const DEMO_ITEMS = [
   {
     id: 'kuchen',
@@ -55,7 +57,7 @@ const DEMO_ITEMS = [
 
 
 /* =========================================================
-   ELEMENTE
+   HTML-ELEMENTE
    ========================================================= */
 
 const $ = (sel) => document.querySelector(sel);
@@ -121,25 +123,38 @@ function validateSecurityQuestions() {
 
 
 /* =========================================================
-   INITIALISIERUNG
+   GRUNDPRÜFUNG
    ========================================================= */
 
 if (!form) {
+
   console.error(
-    'FEHLER: Das Formular #rsvp wurde nicht gefunden.'
+    'FEHLER: #rsvp wurde nicht gefunden.'
   );
+
 } else {
-
-  $('#title').textContent = EVENT.title;
-
-  $('#meta').textContent =
-    `${EVENT.date}, ${EVENT.time} · ${EVENT.place}`;
-
-  $('#choice-title').textContent = CHOICE_TITLE;
 
 
   /* =======================================================
-     JSONP API
+     TITEL / META
+     ======================================================= */
+
+  if ($('#title')) {
+    $('#title').textContent = EVENT.title;
+  }
+
+  if ($('#meta')) {
+    $('#meta').textContent =
+      `${EVENT.date}, ${EVENT.time} · ${EVENT.place}`;
+  }
+
+  if ($('#choice-title')) {
+    $('#choice-title').textContent = CHOICE_TITLE;
+  }
+
+
+  /* =======================================================
+     VERBINDUNG ZUM APPS SCRIPT
      ======================================================= */
 
   function api(params) {
@@ -147,28 +162,42 @@ if (!form) {
     return new Promise((resolve, reject) => {
 
       const cb =
-        'cb_' + Math.random().toString(36).slice(2);
+        'cb_' +
+        Math.random()
+          .toString(36)
+          .slice(2);
+
 
       const script =
         document.createElement('script');
 
+
       const cleanup = () => {
+
         delete window[cb];
+
         script.remove();
+
       };
 
 
       window[cb] = (data) => {
+
         cleanup();
+
         resolve(data);
+
       };
 
 
       script.onerror = () => {
+
         cleanup();
+
         reject(
           new Error('Keine Verbindung')
         );
+
       };
 
 
@@ -182,22 +211,51 @@ if (!form) {
 
 
       document.body.appendChild(script);
+
     });
+
   }
 
 
   /* =======================================================
-     BESTAND
+     STATUS / FEHLER
+     ======================================================= */
+
+  function error(msg) {
+
+    if ($('#error')) {
+      $('#error').textContent = msg || '';
+    }
+
+  }
+
+
+  function status(msg) {
+
+    if ($('#status')) {
+      $('#status').textContent = msg || '';
+    }
+
+  }
+
+
+  /* =======================================================
+     AUSWAHL LADEN
      ======================================================= */
 
   async function loadStock() {
 
     status('Lade die Auswahl …');
 
+
     try {
 
       const res = ENDPOINT
-        ? await api({ action: 'stock' })
+
+        ? await api({
+            action: 'stock'
+          })
+
         : {
             ok: true,
             items: DEMO_ITEMS
@@ -205,15 +263,23 @@ if (!form) {
 
 
       if (!res.ok) {
+
         throw new Error(
-          res.error || 'Unbekannter Fehler'
+          res.error ||
+          'Unbekannter Fehler'
         );
+
       }
 
 
-      items = res.items || [];
+      items =
+        Array.isArray(res.items)
+          ? res.items
+          : [];
+
 
       status('');
+
 
     } catch (err) {
 
@@ -222,22 +288,36 @@ if (!form) {
       status(
         'Die Auswahl konnte nicht geladen werden. Bitte die Seite neu laden.'
       );
+
     }
 
 
     renderChoices();
+
   }
 
 
+  /* =======================================================
+     AUSWAHL ANZEIGEN
+     ======================================================= */
+
   function renderChoices() {
 
-    const keep = getChoices();
+    if (!$('#choices')) {
+      return;
+    }
 
-    const free = items.filter(
-      (i) =>
-        i.left === null ||
-        i.left > 0
-    );
+
+    const keep =
+      getChoices();
+
+
+    const free =
+      items.filter(
+        (i) =>
+          i.left === null ||
+          i.left > 0
+      );
 
 
     if (!free.length) {
@@ -246,6 +326,7 @@ if (!form) {
         '<p>Es ist schon alles vergeben – einfach weiterklicken.</p>';
 
       return;
+
     }
 
 
@@ -256,6 +337,7 @@ if (!form) {
 
 
     $('#choices').innerHTML =
+
       free
         .map((i) => {
 
@@ -265,14 +347,21 @@ if (!form) {
               : ` <small>noch ${i.left} frei</small>`;
 
 
+          const checked =
+            keep.includes(i.id)
+              ? ' checked'
+              : '';
+
+
           return `
             <label class="choice">
+
               <input
                 type="${type}"
                 name="choice"
-                value="${i.id}"
-                ${keep.includes(i.id) ? 'checked' : ''}
+                value="${escapeHtml(i.id)}"${checked}
               >
+
               <span>
                 ${escapeHtml(i.label)}
                 ${rest}
@@ -282,12 +371,19 @@ if (!form) {
                     : ''
                 }
               </span>
+
             </label>
           `;
+
         })
         .join('');
+
   }
 
+
+  /* =======================================================
+     HTML ESCAPEN
+     ======================================================= */
 
   function escapeHtml(s) {
 
@@ -300,8 +396,13 @@ if (!form) {
         '"': '&quot;'
       }[c])
     );
+
   }
 
+
+  /* =======================================================
+     AUSWAHL AUSLESEN
+     ======================================================= */
 
   function getChoices() {
 
@@ -312,21 +413,34 @@ if (!form) {
     ].map(
       (el) => el.value
     );
+
   }
 
+
+  /* =======================================================
+     AUSWAHL-NAMEN
+     ======================================================= */
 
   function labelsFor(ids) {
 
     return ids
       .map(
-        (id) =>
-          (
+        (id) => {
+
+          const found =
             items.find(
               (i) => i.id === id
-            ) || { label: id }
-          ).label
+            );
+
+
+          return found
+            ? found.label
+            : id;
+
+        }
       )
       .join('; ');
+
   }
 
 
@@ -340,7 +454,7 @@ if (!form) {
   function show(i) {
 
     console.log(
-      'Wechsle zu Schritt:',
+      'show() → Schritt',
       i
     );
 
@@ -349,14 +463,16 @@ if (!form) {
       i < 0 ||
       i >= stepEls.length
     ) {
+
       console.error(
         'Ungültiger Schritt:',
         i,
-        'Anzahl Schritte:',
+        'Vorhandene Schritte:',
         stepEls.length
       );
 
       return;
+
     }
 
 
@@ -365,13 +481,20 @@ if (!form) {
 
     stepEls.forEach(
       (el, index) => {
-        el.hidden = index !== i;
+
+        el.hidden =
+          index !== i;
+
       }
     );
 
 
-    $('#progress').textContent =
-      `Schritt ${i + 1} von ${stepEls.length}`;
+    if ($('#progress')) {
+
+      $('#progress').textContent =
+        `Schritt ${i + 1} von ${stepEls.length}`;
+
+    }
 
 
     error('');
@@ -382,7 +505,9 @@ if (!form) {
     */
 
     if (i === 2) {
+
       loadStock();
+
     }
 
 
@@ -393,18 +518,11 @@ if (!form) {
 
 
     if (first) {
+
       first.focus();
+
     }
-  }
 
-
-  function error(msg) {
-    $('#error').textContent = msg;
-  }
-
-
-  function status(msg) {
-    $('#status').textContent = msg;
   }
 
 
@@ -415,52 +533,63 @@ if (!form) {
   function validate(i) {
 
 
-    /* -----------------------------------------------
+    /* -----------------------------------------------------
        SCHRITT 0
        Sicherheitsfragen
-       ----------------------------------------------- */
+       ----------------------------------------------------- */
 
     if (i === 0) {
+
       return validateSecurityQuestions();
+
     }
 
 
-    /* -----------------------------------------------
+    /* -----------------------------------------------------
        SCHRITT 1
        Name / E-Mail
-       ----------------------------------------------- */
+       ----------------------------------------------------- */
 
     if (i === 1) {
 
       const name =
-        $('#name').value.trim();
+        $('#name')
+          .value
+          .trim();
 
 
       if (!name) {
+
         return 'Bitte den Namen eintragen.';
+
       }
 
 
       const mail =
-        $('#email').value.trim();
+        $('#email')
+          .value
+          .trim();
 
 
       if (
         mail &&
         !$('#email').checkValidity()
       ) {
+
         return 'Diese E-Mail-Adresse sieht unvollständig aus.';
+
       }
 
 
       return null;
+
     }
 
 
-    /* -----------------------------------------------
+    /* -----------------------------------------------------
        SCHRITT 2
        Auswahl
-       ----------------------------------------------- */
+       ----------------------------------------------------- */
 
     if (i === 2) {
 
@@ -477,75 +606,111 @@ if (!form) {
         available &&
         !getChoices().length
       ) {
+
         return 'Bitte mindestens eine Option wählen.';
+
       }
 
 
       return null;
+
     }
 
 
     return null;
+
   }
 
 
   /* =======================================================
-     BUTTONS
+     WEITER-BUTTONS
      ======================================================= */
 
-  form.addEventListener(
-    'click',
-    (e) => {
-
-      const next =
-        e.target.closest('[data-next]');
-
-      const back =
-        e.target.closest('[data-back]');
+  const nextButtons =
+    form.querySelectorAll(
+      '[data-next]'
+    );
 
 
-      if (next) {
-
-        console.log(
-          'Weiter geklickt. Aktueller Schritt:',
-          step
-        );
+  console.log(
+    'Weiter-Buttons gefunden:',
+    nextButtons.length
+  );
 
 
-        const problem =
-          validate(step);
+  nextButtons.forEach(
+    (button) => {
 
-
-        if (problem) {
+      button.addEventListener(
+        'click',
+        () => {
 
           console.log(
-            'Validierung fehlgeschlagen:',
-            problem
+            'WEITER geklickt'
           );
 
-          error(problem);
 
-          return;
+          console.log(
+            'Aktueller Schritt:',
+            step
+          );
+
+
+          const problem =
+            validate(step);
+
+
+          if (problem) {
+
+            console.log(
+              'Validierungsfehler:',
+              problem
+            );
+
+
+            error(problem);
+
+            return;
+
+          }
+
+
+          console.log(
+            'Validierung erfolgreich'
+          );
+
+
+          show(step + 1);
+
         }
+      );
+
+    }
+  );
 
 
-        console.log(
-          'Validierung erfolgreich.'
-        );
+  /* =======================================================
+     ZURÜCK-BUTTONS
+     ======================================================= */
+
+  const backButtons =
+    form.querySelectorAll(
+      '[data-back]'
+    );
 
 
-        show(step + 1);
+  backButtons.forEach(
+    (button) => {
 
-        return;
-      }
+      button.addEventListener(
+        'click',
+        () => {
 
+          show(step - 1);
 
-      if (back) {
+        }
+      );
 
-        show(step - 1);
-
-        return;
-      }
     }
   );
 
@@ -581,16 +746,23 @@ if (!form) {
       const data = {
 
         name:
-          $('#name').value.trim(),
+          $('#name')
+            .value
+            .trim(),
 
         email:
-          $('#email').value.trim(),
+          $('#email')
+            .value
+            .trim(),
 
         remarks:
-          $('#remarks').value.trim(),
+          $('#remarks')
+            .value
+            .trim(),
 
         choices:
           ids.join(',')
+
       };
 
 
@@ -605,28 +777,38 @@ if (!form) {
       try {
 
         res = ENDPOINT
+
           ? await api({
               action: 'submit',
               ...data
             })
+
           : {
               ok: true,
               items: items
             };
 
+
       } catch (err) {
 
         console.error(err);
+
 
         error(
           'Senden hat nicht geklappt. Bitte nochmal versuchen.'
         );
 
+
         button.disabled = false;
 
         return;
+
       }
 
+
+      /* ---------------------------------------------------
+         Server meldet Konflikt
+         --------------------------------------------------- */
 
       if (!res.ok) {
 
@@ -638,26 +820,48 @@ if (!form) {
           items =
             res.items || items;
 
+
           renderChoices();
+
 
           show(2);
 
-          return error(
+
+          error(
             `${labelsFor(res.conflict)} ist inzwischen vergeben. Bitte neu wählen.`
           );
+
+
+          return;
+
         }
 
 
-        return error(
+        error(
           'Senden hat nicht geklappt: ' +
-          (res.error || 'unbekannt')
+          (
+            res.error ||
+            'unbekannt'
+          )
         );
+
+
+        return;
+
       }
 
 
+      /* ---------------------------------------------------
+         Erfolgreich
+         --------------------------------------------------- */
+
       form.hidden = true;
 
-      $('#progress').hidden = true;
+
+      if ($('#progress')) {
+        $('#progress').hidden = true;
+      }
+
 
       $('#step-done').hidden = false;
 
@@ -673,39 +877,53 @@ if (!form) {
 
       blob =
         await new Promise(
-          (done) =>
+          (done) => {
+
             $('#ticket').toBlob(
               done,
               'image/png'
-            )
+            );
+
+          }
         );
 
 
       if (canShareFiles()) {
+
         $('#share').hidden = false;
+
       }
+
     }
   );
 
 
   /* =======================================================
-     BILD
+     TICKET BILD
      ======================================================= */
 
-  async function drawTicket(canvas, data) {
+  async function drawTicket(
+    canvas,
+    data
+  ) {
 
     try {
+
       await document.fonts.ready;
+
     } catch (e) {}
 
 
     const ctx =
       canvas.getContext('2d');
 
+
     const M = 90;
 
 
-    ctx.fillStyle = '#f5f2ec';
+    ctx.fillStyle =
+      '#f5f2ec';
+
 
     ctx.fillRect(
       0,
@@ -715,7 +933,9 @@ if (!form) {
     );
 
 
-    ctx.fillStyle = '#16181d';
+    ctx.fillStyle =
+      '#16181d';
+
 
     ctx.textBaseline =
       'alphabetic';
@@ -723,6 +943,7 @@ if (!form) {
 
     ctx.font =
       '700 80px system-ui, sans-serif';
+
 
     ctx.fillText(
       EVENT.title,
@@ -734,6 +955,7 @@ if (!form) {
     ctx.font =
       '400 40px system-ui, sans-serif';
 
+
     ctx.fillText(
       data.name || 'Gast',
       M,
@@ -743,13 +965,25 @@ if (!form) {
 
     const rows = [
 
-      ['Datum', EVENT.date],
+      [
+        'Datum',
+        EVENT.date
+      ],
 
-      ['Uhrzeit', EVENT.time],
+      [
+        'Uhrzeit',
+        EVENT.time
+      ],
 
-      ['Ort', EVENT.place],
+      [
+        'Ort',
+        EVENT.place
+      ],
 
-      ['Du bringst mit', data.choiceText]
+      [
+        'Du bringst mit',
+        data.choiceText
+      ]
 
     ];
 
@@ -757,13 +991,18 @@ if (!form) {
     let y = 480;
 
 
-    for (const [label, value] of rows) {
+    for (
+      const [label, value]
+      of rows
+    ) {
 
       ctx.font =
         '400 24px system-ui, sans-serif';
 
+
       ctx.fillStyle =
         '#6b7078';
+
 
       ctx.fillText(
         label.toUpperCase(),
@@ -775,18 +1014,24 @@ if (!form) {
       ctx.font =
         '500 36px system-ui, sans-serif';
 
+
       ctx.fillStyle =
         '#16181d';
 
+
       ctx.fillText(
-        String(value || '–'),
+        String(
+          value || '–'
+        ),
         M,
         y + 48
       );
 
 
       y += 120;
+
     }
+
   }
 
 
@@ -798,7 +1043,9 @@ if (!form) {
     'click',
     () => {
 
-      if (!blob) return;
+      if (!blob) {
+        return;
+      }
 
 
       const url =
@@ -819,10 +1066,12 @@ if (!form) {
 
 
       setTimeout(
-        () =>
-          URL.revokeObjectURL(url),
+        () => {
+          URL.revokeObjectURL(url);
+        },
         4000
       );
+
     }
   );
 
@@ -838,18 +1087,30 @@ if (!form) {
       try {
 
         await navigator.share({
-          title: EVENT.title,
-          files: [file()]
+
+          title:
+            EVENT.title,
+
+          files: [
+            file()
+          ]
+
         });
+
 
       } catch (err) {
 
         if (
-          err.name !== 'AbortError'
+          err.name !==
+          'AbortError'
         ) {
+
           console.error(err);
+
         }
+
       }
+
     }
   );
 
@@ -863,6 +1124,7 @@ if (!form) {
         type: 'image/png'
       }
     );
+
   }
 
 
@@ -878,7 +1140,9 @@ if (!form) {
     } catch (e) {
 
       return false;
+
     }
+
   }
 
 }
