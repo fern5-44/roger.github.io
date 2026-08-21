@@ -1095,11 +1095,7 @@ if (!form) {
         '–'
       ],
 
-      [
-        'Dein Lieblingslied',
-        data.song || '–'
-      ]
-
+     
     ];
 
 
@@ -1221,13 +1217,13 @@ if (!form) {
 
         ctx.strokeStyle = GREEN;
 
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2;
 
-        ctx.strokeRect(M, y, 34, 34);
+        ctx.strokeRect(M, y, 21, 21);
 
 
         ctx.font =
-          '400 34px system-ui, sans-serif';
+          '200 18px system-ui, sans-serif';
 
         ctx.fillStyle = INK;
 
