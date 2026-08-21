@@ -609,6 +609,7 @@ if (!form) {
         return 'Dini Lieblingszuetat uf de Pizza:';
       }
 
+       
 
       return null;
 
@@ -775,6 +776,9 @@ if (!form) {
         lieblingslied:
           $('#lieblingslied').value.trim(),
 
+        zutat:
+          $('#zutat').value.trim(),
+
         remarks:
           $('#remarks').value.trim(),
 
@@ -867,7 +871,6 @@ if (!form) {
         $('#ticket'),
         {
           name: data.name,
-          song: data.lieblingslied,
           choiceText: data.choiceText,
           remarks: data.remarks
         }
