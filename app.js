@@ -11,7 +11,21 @@ const EVENT = {
 
 
 /* =========================================================
-   APPS SCRIPT
+   APPS SCRIPT  ***HIER DIE VERBINDUNG ZUM SHEET***
+   ---------------------------------------------------------
+   Diese URL muss die AKTUELLE Bereitstellung der Web-App sein.
+   Google vergibt bei JEDER neuen Bereitstellung eine neue URL –
+   deshalb reisst die Verbindung ab, wenn man am Skript etwas
+   aendert und die alte URL stehen laesst.
+
+   So kommst du an eine frische URL:
+   1. Google-Tabelle oeffnen -> Erweiterungen -> Apps Script
+   2. Inhalt von apps-script.gs komplett hineinkopieren, speichern
+   3. Bereitstellen -> Neue Bereitstellung -> Typ: Web-App
+      Ausfuehren als: Ich   |   Zugriff: Jeder
+   4. Die angezeigte URL (endet auf /exec) hier unten einsetzen
+   5. Zum Testen im Browser aufrufen:  <URL>?action=ping
+      Es muss  {"ok":true, ...}  erscheinen.
    ========================================================= */
 
 const ENDPOINT =
@@ -19,40 +33,39 @@ const ENDPOINT =
 
 
 /* =========================================================
-   AUSWAHL
+   AUSWAHL – SCHRITT 3
    ========================================================= */
 
-const CHOICE_TITLE = 'Was bringst du mit?';
-const CHOICE_MODE = 'multi';
+const CHOICE_TITLE = 'Wie lange bist du dabei?';
+const CHOICE_MODE = 'single';      // 'single' = ankreuzen, nur eine Option
 const CHOICE_REQUIRED = true;
 
-
-// Nur für den Testbetrieb
-const DEMO_ITEMS = [
+const OPTIONS = [
   {
-    id: 'kuchen',
-    label: 'Kuchen',
-    note: 'Schoko',
-    left: 3
+    id: 'openend',
+    label: 'Open End am Samstagabend',
+    note: 'Ich bleibe bis zum Schluss und fahre danach heim'
   },
   {
-    id: 'salat',
-    label: 'Salat',
-    note: 'GusGus',
-    left: 2
+    id: 'uebernachten',
+    label: 'Mit Übernachten bis Sonntag',
+    note: 'Ich bleibe über Nacht'
   },
   {
-    id: 'Sauce',
-    label: 'Sauce',
-    note: '',
-    left: 2
-  },
-  {
-    id: 'nichts',
-    label: 'Überraschung',
-    note: 'Es befindet sich nicht auf der Liste aber muss unbedingt mit!',
-    left: null
+    id: 'anderes',
+    label: 'Anderes',
+    note: 'Bitte im nächsten Schritt in die Bemerkung schreiben'
   }
+];
+
+
+/* =========================================================
+   CHECKLISTE FÜR DAS BILD
+   ========================================================= */
+
+const CHECKLIST = [
+  'Schlittschuhe',
+  'Zugticket'
 ];
 
 
@@ -68,7 +81,7 @@ const stepEls = [
   ...document.querySelectorAll('[data-step]')
 ];
 
-let items = [];
+let items = OPTIONS.slice();
 let blob = null;
 
 
@@ -155,9 +168,13 @@ if (!form) {
 
   /* =======================================================
      VERBINDUNG ZUM APPS SCRIPT
+
+     Apps Script beantwortet keinen CORS-Preflight und die
+     /exec-Adresse leitet um. Mit JSONP umgeht man beides:
+     das Skript ruft unsere Callback-Funktion selbst auf.
      ======================================================= */
 
-  function api(params) {
+  function api(params, timeoutMs) {
 
     return new Promise((resolve, reject) => {
 
@@ -172,7 +189,14 @@ if (!form) {
         document.createElement('script');
 
 
+      let timer = null;
+
+
       const cleanup = () => {
+
+        if (timer) {
+          clearTimeout(timer);
+        }
 
         delete window[cb];
 
@@ -195,10 +219,27 @@ if (!form) {
         cleanup();
 
         reject(
-          new Error('Keine Verbindung')
+          new Error('Keine Verbindung zum Anmelde-Sheet')
         );
 
       };
+
+
+      /* Ohne Zeitlimit haengt die Seite, wenn Google gar
+         nicht erst antwortet (z. B. alte Bereitstellung). */
+
+      timer = setTimeout(
+        () => {
+
+          cleanup();
+
+          reject(
+            new Error('Zeitüberschreitung beim Anmelde-Sheet')
+          );
+
+        },
+        timeoutMs || 15000
+      );
 
 
       script.src =
@@ -240,61 +281,66 @@ if (!form) {
 
 
   /* =======================================================
-     AUSWAHL LADEN
+     VERBINDUNGSTEST BEIM LADEN
+
+     Meldet sich nur, wenn etwas nicht stimmt – dann weisst du
+     sofort, dass die ENDPOINT-URL erneuert werden muss.
      ======================================================= */
 
-  async function loadStock() {
+  let online = false;
 
-    status('Lade die Auswahl …');
 
+  async function checkConnection() {
 
     try {
 
-      const res = ENDPOINT
-
-        ? await api({
-            action: 'stock'
-          })
-
-        : {
-            ok: true,
-            items: DEMO_ITEMS
-          };
+      const res = await api(
+        { action: 'ping' },
+        10000
+      );
 
 
-      if (!res.ok) {
+      if (res && res.ok) {
 
-        throw new Error(
-          res.error ||
-          'Unbekannter Fehler'
+        online = true;
+
+        status('');
+
+        console.log(
+          'Verbindung zum Anmelde-Sheet steht.',
+          res
         );
+
+        return;
 
       }
 
 
-      items =
-        Array.isArray(res.items)
-          ? res.items
-          : [];
-
-
-      status('');
+      throw new Error(
+        (res && res.error) || 'unbekannte Antwort'
+      );
 
 
     } catch (err) {
 
-      console.error(err);
+      online = false;
+
+      console.error(
+        'Verbindung zum Anmelde-Sheet fehlgeschlagen:',
+        err
+      );
 
       status(
-        'Die Auswahl konnte nicht geladen werden. Bitte die Seite neu laden.'
+        'Hinweis: Die Verbindung zur Anmeldeliste antwortet gerade nicht. ' +
+        'Du kannst das Formular trotzdem ausfüllen – beim Abschicken wird es erneut versucht.'
       );
 
     }
 
-
-    renderChoices();
-
   }
+
+
+  checkConnection();
 
 
   /* =======================================================
@@ -308,26 +354,7 @@ if (!form) {
     }
 
 
-    const keep =
-      getChoices();
-
-
-    const free =
-      items.filter(
-        (i) =>
-          i.left === null ||
-          i.left > 0
-      );
-
-
-    if (!free.length) {
-
-      $('#choices').innerHTML =
-        '<p>Es ist schon alles vergeben – einfach weiterklicken.</p>';
-
-      return;
-
-    }
+    const keep = getChoices();
 
 
     const type =
@@ -338,14 +365,8 @@ if (!form) {
 
     $('#choices').innerHTML =
 
-      free
+      items
         .map((i) => {
-
-          const rest =
-            i.left === null
-              ? ''
-              : ` <small>noch ${i.left} frei</small>`;
-
 
           const checked =
             keep.includes(i.id)
@@ -364,10 +385,9 @@ if (!form) {
 
               <span>
                 ${escapeHtml(i.label)}
-                ${rest}
                 ${
                   i.note
-                    ? ` <small>${escapeHtml(i.note)}</small>`
+                    ? `<small>${escapeHtml(i.note)}</small>`
                     : ''
                 }
               </span>
@@ -377,6 +397,47 @@ if (!form) {
 
         })
         .join('');
+
+
+    /* Bei "Anderes" wird die Bemerkung gebraucht. */
+
+    $('#choices')
+      .querySelectorAll('input[name="choice"]')
+      .forEach(
+        (el) => {
+
+          el.addEventListener(
+            'change',
+            updateRemarksHint
+          );
+
+        }
+      );
+
+
+    updateRemarksHint();
+
+  }
+
+
+  function needsRemarks() {
+
+    return getChoices().includes('anderes');
+
+  }
+
+
+  function updateRemarksHint() {
+
+    if (!$('#remarks-hint')) {
+      return;
+    }
+
+
+    $('#remarks-hint').textContent =
+      needsRemarks()
+        ? '(bitte ausfüllen)'
+        : '(optional)';
 
   }
 
@@ -453,12 +514,6 @@ if (!form) {
 
   function show(i) {
 
-    console.log(
-      'show() → Schritt',
-      i
-    );
-
-
     if (
       i < 0 ||
       i >= stepEls.length
@@ -466,9 +521,7 @@ if (!form) {
 
       console.error(
         'Ungültiger Schritt:',
-        i,
-        'Vorhandene Schritte:',
-        stepEls.length
+        i
       );
 
       return;
@@ -482,8 +535,7 @@ if (!form) {
     stepEls.forEach(
       (el, index) => {
 
-        el.hidden =
-          index !== i;
+        el.hidden = index !== i;
 
       }
     );
@@ -500,17 +552,6 @@ if (!form) {
     error('');
 
 
-    /*
-      Schritt 2 = Auswahl
-    */
-
-    if (i === 2) {
-
-      loadStock();
-
-    }
-
-
     const first =
       stepEls[i].querySelector(
         'input:not([type="radio"]):not([type="checkbox"]), textarea, select'
@@ -518,9 +559,7 @@ if (!form) {
 
 
     if (first) {
-
       first.focus();
-
     }
 
   }
@@ -534,8 +573,7 @@ if (!form) {
 
 
     /* -----------------------------------------------------
-       SCHRITT 0
-       Sicherheitsfragen
+       SCHRITT 1 – Sicherheitsfragen
        ----------------------------------------------------- */
 
     if (i === 0) {
@@ -546,37 +584,43 @@ if (!form) {
 
 
     /* -----------------------------------------------------
-       SCHRITT 1
-       Name / E-Mail
+       SCHRITT 2 – Name und Lieblingslied
        ----------------------------------------------------- */
 
     if (i === 1) {
 
-      const name =
-        $('#name')
-          .value
-          .trim();
-
-
-      if (!name) {
-
-        return 'Bitte den Namen eintragen.';
-
+      if (!$('#vorname').value.trim()) {
+        return 'Bitte den Vornamen eintragen.';
       }
 
 
-      const mail =
-        $('#email')
-          .value
-          .trim();
+      if (!$('#nachname').value.trim()) {
+        return 'Bitte den Nachnamen eintragen.';
+      }
 
+
+      if (!$('#lieblingslied').value.trim()) {
+        return 'Bitte ein Lieblingslied eintragen.';
+      }
+
+
+      return null;
+
+    }
+
+
+    /* -----------------------------------------------------
+       SCHRITT 3 – Auswahl
+       ----------------------------------------------------- */
+
+    if (i === 2) {
 
       if (
-        mail &&
-        !$('#email').checkValidity()
+        CHOICE_REQUIRED &&
+        !getChoices().length
       ) {
 
-        return 'Diese E-Mail-Adresse sieht unvollständig aus.';
+        return 'Bitte eine Option ankreuzen.';
 
       }
 
@@ -587,27 +631,17 @@ if (!form) {
 
 
     /* -----------------------------------------------------
-       SCHRITT 2
-       Auswahl
+       SCHRITT 4 – Bemerkung
        ----------------------------------------------------- */
 
-    if (i === 2) {
-
-      const available =
-        items.some(
-          (x) =>
-            x.left === null ||
-            x.left > 0
-        );
-
+    if (i === 3) {
 
       if (
-        CHOICE_REQUIRED &&
-        available &&
-        !getChoices().length
+        needsRemarks() &&
+        !$('#remarks').value.trim()
       ) {
 
-        return 'Bitte mindestens eine Option wählen.';
+        return 'Du hast "Anderes" gewählt – bitte kurz in die Bemerkung schreiben.';
 
       }
 
@@ -626,58 +660,23 @@ if (!form) {
      WEITER-BUTTONS
      ======================================================= */
 
-  const nextButtons =
-    form.querySelectorAll(
-      '[data-next]'
-    );
-
-
-  console.log(
-    'Weiter-Buttons gefunden:',
-    nextButtons.length
-  );
-
-
-  nextButtons.forEach(
+  form.querySelectorAll('[data-next]').forEach(
     (button) => {
 
       button.addEventListener(
         'click',
         () => {
 
-          console.log(
-            'WEITER geklickt'
-          );
-
-
-          console.log(
-            'Aktueller Schritt:',
-            step
-          );
-
-
-          const problem =
-            validate(step);
+          const problem = validate(step);
 
 
           if (problem) {
-
-            console.log(
-              'Validierungsfehler:',
-              problem
-            );
-
 
             error(problem);
 
             return;
 
           }
-
-
-          console.log(
-            'Validierung erfolgreich'
-          );
 
 
           show(step + 1);
@@ -693,13 +692,7 @@ if (!form) {
      ZURÜCK-BUTTONS
      ======================================================= */
 
-  const backButtons =
-    form.querySelectorAll(
-      '[data-back]'
-    );
-
-
-  backButtons.forEach(
+  form.querySelectorAll('[data-back]').forEach(
     (button) => {
 
       button.addEventListener(
@@ -719,6 +712,8 @@ if (!form) {
      START
      ======================================================= */
 
+  renderChoices();
+
   show(0);
 
 
@@ -733,35 +728,55 @@ if (!form) {
       e.preventDefault();
 
 
+      const problem = validate(3);
+
+
+      if (problem) {
+
+        error(problem);
+
+        return;
+
+      }
+
+
       const button =
         form.querySelector(
           'button[type="submit"]'
         );
 
 
-      const ids =
-        getChoices();
+      const ids = getChoices();
+
+
+      const vorname =
+        $('#vorname').value.trim();
+
+      const nachname =
+        $('#nachname').value.trim();
 
 
       const data = {
 
-        name:
-          $('#name')
-            .value
-            .trim(),
+        vorname: vorname,
 
-        email:
-          $('#email')
-            .value
-            .trim(),
+        nachname: nachname,
+
+        /* zusammengesetzt, damit die Tabelle auch eine
+           fertige Namensspalte hat */
+        name: (vorname + ' ' + nachname).trim(),
+
+        lieblingslied:
+          $('#lieblingslied').value.trim(),
 
         remarks:
-          $('#remarks')
-            .value
-            .trim(),
+          $('#remarks').value.trim(),
 
         choices:
-          ids.join(',')
+          ids.join(','),
+
+        choiceText:
+          labelsFor(ids)
 
       };
 
@@ -770,32 +785,33 @@ if (!form) {
 
       error('');
 
+      status('Anmeldung wird gesendet …');
+
 
       let res;
 
 
       try {
 
-        res = ENDPOINT
-
-          ? await api({
-              action: 'submit',
-              ...data
-            })
-
-          : {
-              ok: true,
-              items: items
-            };
+        res = await api(
+          {
+            action: 'submit',
+            ...data
+          },
+          20000
+        );
 
 
       } catch (err) {
 
         console.error(err);
 
+        status('');
+
 
         error(
-          'Senden hat nicht geklappt. Bitte nochmal versuchen.'
+          'Senden hat nicht geklappt – die Anmeldeliste ist nicht erreichbar. ' +
+          'Bitte nochmal versuchen oder kurz Bescheid geben.'
         );
 
 
@@ -806,43 +822,16 @@ if (!form) {
       }
 
 
-      /* ---------------------------------------------------
-         Server meldet Konflikt
-         --------------------------------------------------- */
-
-      if (!res.ok) {
+      if (!res || !res.ok) {
 
         button.disabled = false;
 
-
-        if (res.conflict) {
-
-          items =
-            res.items || items;
-
-
-          renderChoices();
-
-
-          show(2);
-
-
-          error(
-            `${labelsFor(res.conflict)} ist inzwischen vergeben. Bitte neu wählen.`
-          );
-
-
-          return;
-
-        }
+        status('');
 
 
         error(
           'Senden hat nicht geklappt: ' +
-          (
-            res.error ||
-            'unbekannt'
-          )
+          ((res && res.error) || 'unbekannt')
         );
 
 
@@ -854,6 +843,8 @@ if (!form) {
       /* ---------------------------------------------------
          Erfolgreich
          --------------------------------------------------- */
+
+      status('');
 
       form.hidden = true;
 
@@ -870,7 +861,9 @@ if (!form) {
         $('#ticket'),
         {
           name: data.name,
-          choiceText: labelsFor(ids)
+          song: data.lieblingslied,
+          choiceText: data.choiceText,
+          remarks: data.remarks
         }
       );
 
@@ -902,10 +895,91 @@ if (!form) {
      TICKET BILD
      ======================================================= */
 
-  async function drawTicket(
-    canvas,
-    data
-  ) {
+  /* Schriftgroesse so lange verkleinern, bis der Text passt. */
+  function fitFont(ctx, text, maxWidth, size, weight) {
+
+    let s = size;
+
+
+    while (s > 18) {
+
+      ctx.font =
+        `${weight} ${s}px system-ui, sans-serif`;
+
+
+      if (ctx.measureText(text).width <= maxWidth) {
+        break;
+      }
+
+
+      s -= 2;
+
+    }
+
+
+    return s;
+
+  }
+
+
+  /* Text auf mehrere Zeilen umbrechen. */
+  function wrap(ctx, text, maxWidth, maxLines) {
+
+    const words = String(text).split(/\s+/);
+
+    const lines = [];
+
+    let line = '';
+
+
+    words.forEach(
+      (w) => {
+
+        const test = line ? line + ' ' + w : w;
+
+
+        if (
+          ctx.measureText(test).width > maxWidth &&
+          line
+        ) {
+
+          lines.push(line);
+
+          line = w;
+
+        } else {
+
+          line = test;
+
+        }
+
+      }
+    );
+
+
+    if (line) {
+      lines.push(line);
+    }
+
+
+    if (lines.length > maxLines) {
+
+      const cut = lines.slice(0, maxLines);
+
+      cut[maxLines - 1] =
+        cut[maxLines - 1].replace(/\s*\S*$/, '') + ' …';
+
+      return cut;
+
+    }
+
+
+    return lines;
+
+  }
+
+
+  async function drawTicket(canvas, data) {
 
     try {
 
@@ -914,123 +988,268 @@ if (!form) {
     } catch (e) {}
 
 
-    const ctx =
-      canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
+
+    const W = canvas.width;
+    const H = canvas.height;
+
+    const M = 100;
+    const CW = W - M * 2;
 
 
-    const M = 90;
+    /* --- Farben, passend zur Seite --- */
+    const PAPER = '#faf8f3';
+    const INK = '#2c2822';
+    const GREEN = '#4f6146';
+    const GREEN_DARK = '#3d4c36';
+    const BROWN = '#8a7f6a';
+    const LINE = '#d9d2c4';
 
 
-    ctx.fillStyle =
-      '#f5f2ec';
+    /* --- Untergrund --- */
+
+    ctx.fillStyle = PAPER;
+
+    ctx.fillRect(0, 0, W, H);
 
 
-    ctx.fillRect(
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
+    /* --- Gruener Balken oben --- */
+
+    ctx.fillStyle = GREEN;
+
+    ctx.fillRect(0, 0, W, 16);
 
 
-    ctx.fillStyle =
-      '#16181d';
+    /* --- Feiner Rahmen --- */
+
+    ctx.strokeStyle = LINE;
+
+    ctx.lineWidth = 2;
+
+    ctx.strokeRect(40, 46, W - 80, H - 86);
 
 
-    ctx.textBaseline =
-      'alphabetic';
+    ctx.textBaseline = 'alphabetic';
 
+
+    /* --- Titel --- */
+
+    const titleSize =
+      fitFont(ctx, EVENT.title, CW, 78, '700');
 
     ctx.font =
-      '700 80px system-ui, sans-serif';
+      `700 ${titleSize}px system-ui, sans-serif`;
+
+    ctx.fillStyle = GREEN_DARK;
+
+    ctx.fillText(EVENT.title, M, 200);
 
 
-    ctx.fillText(
-      EVENT.title,
-      M,
-      220
-    );
+    /* --- Name --- */
 
+    const nameSize =
+      fitFont(ctx, data.name || 'Gast', CW, 44, '400');
 
     ctx.font =
-      '400 40px system-ui, sans-serif';
+      `400 ${nameSize}px system-ui, sans-serif`;
+
+    ctx.fillStyle = INK;
+
+    ctx.fillText(data.name || 'Gast', M, 262);
 
 
-    ctx.fillText(
-      data.name || 'Gast',
-      M,
-      340
-    );
+    /* --- Trennlinie --- */
 
+    ctx.strokeStyle = LINE;
+
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+
+    ctx.moveTo(M, 306);
+
+    ctx.lineTo(W - M, 306);
+
+    ctx.stroke();
+
+
+    /* --- Zusammenfassung --- */
 
     const rows = [
 
       [
-        'Datum',
-        EVENT.date
+        'Wann',
+        `${EVENT.date} · ${EVENT.time}`
       ],
 
       [
-        'Uhrzeit',
-        EVENT.time
-      ],
-
-      [
-        'Ort',
+        'Wo',
         EVENT.place
       ],
 
       [
-        'Du bringst mit',
-        data.choiceText
+        'Du bleibst',
+        data.choiceText ||
+        '–'
+      ],
+
+      [
+        'Dein Lieblingslied',
+        data.song || '–'
       ]
 
     ];
 
 
-    let y = 480;
+    /* Erst messen, dann setzen: so bleibt der Abstand stimmig,
+       egal ob ein Liedtitel kurz ist oder ueber zwei Zeilen geht. */
+
+    ctx.font =
+      '500 36px system-ui, sans-serif';
 
 
-    for (
-      const [label, value]
-      of rows
-    ) {
-
-      ctx.font =
-        '400 24px system-ui, sans-serif';
-
-
-      ctx.fillStyle =
-        '#6b7078';
-
-
-      ctx.fillText(
-        label.toUpperCase(),
-        M,
-        y
+    const wrapped =
+      rows.map(
+        ([, value]) =>
+          wrap(ctx, String(value || '–'), CW, 2)
       );
 
 
-      ctx.font =
-        '500 36px system-ui, sans-serif';
+    const TOP = 400;
+    const FOOT = 150;
+    const CHECK_BLOCK = 106 + CHECKLIST.length * 70;
 
 
-      ctx.fillStyle =
-        '#16181d';
-
-
-      ctx.fillText(
-        String(
-          value || '–'
-        ),
-        M,
-        y + 48
+    const textHeight =
+      wrapped.reduce(
+        (sum, lines) => sum + 46 + lines.length * 44,
+        0
       );
 
 
-      y += 120;
+    let gap =
+      Math.round(
+        (H - FOOT - TOP - textHeight - CHECK_BLOCK) /
+        rows.length
+      );
 
-    }
+
+    gap = Math.max(22, Math.min(46, gap));
+
+
+    let y = TOP;
+
+
+    rows.forEach(
+      ([label], index) => {
+
+        ctx.font =
+          '600 24px system-ui, sans-serif';
+
+        ctx.fillStyle = BROWN;
+
+        ctx.fillText(
+          label.toUpperCase(),
+          M,
+          y
+        );
+
+
+        ctx.font =
+          '500 36px system-ui, sans-serif';
+
+        ctx.fillStyle = INK;
+
+
+        const lines = wrapped[index];
+
+
+        lines.forEach(
+          (line, idx) => {
+
+            ctx.fillText(
+              line,
+              M,
+              y + 46 + idx * 44
+            );
+
+          }
+        );
+
+
+        y += 46 + lines.length * 44 + gap;
+
+      }
+    );
+
+
+    /* --- Trennlinie --- */
+
+    ctx.strokeStyle = LINE;
+
+    ctx.beginPath();
+
+    ctx.moveTo(M, y);
+
+    ctx.lineTo(W - M, y);
+
+    ctx.stroke();
+
+
+    y += 76;
+
+
+    /* --- Checkliste --- */
+
+    ctx.font =
+      '700 40px system-ui, sans-serif';
+
+    ctx.fillStyle = GREEN_DARK;
+
+    ctx.fillText('Bitte mitbringen', M, y);
+
+
+    y += 30;
+
+
+    CHECKLIST.forEach(
+      (thing) => {
+
+        /* Kaestchen zum Abhaken */
+
+        ctx.strokeStyle = GREEN;
+
+        ctx.lineWidth = 3;
+
+        ctx.strokeRect(M, y, 34, 34);
+
+
+        ctx.font =
+          '400 34px system-ui, sans-serif';
+
+        ctx.fillStyle = INK;
+
+        ctx.fillText(thing, M + 56, y + 28);
+
+
+        y += 70;
+
+      }
+    );
+
+
+    /* --- Fusszeile --- */
+
+    ctx.font =
+      '400 26px system-ui, sans-serif';
+
+    ctx.fillStyle = BROWN;
+
+    ctx.fillText(
+      'Bis bald – ich freue mich auf dich!',
+      M,
+      H - 96
+    );
 
   }
 
@@ -1048,18 +1267,14 @@ if (!form) {
       }
 
 
-      const url =
-        URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
 
-
-      const a =
-        document.createElement('a');
+      const a = document.createElement('a');
 
 
       a.href = url;
 
-      a.download =
-        'einladung.png';
+      a.download = 'einladung.png';
 
 
       a.click();
@@ -1088,22 +1303,16 @@ if (!form) {
 
         await navigator.share({
 
-          title:
-            EVENT.title,
+          title: EVENT.title,
 
-          files: [
-            file()
-          ]
+          files: [file()]
 
         });
 
 
       } catch (err) {
 
-        if (
-          err.name !==
-          'AbortError'
-        ) {
+        if (err.name !== 'AbortError') {
 
           console.error(err);
 
@@ -1120,9 +1329,7 @@ if (!form) {
     return new File(
       [blob],
       'einladung.png',
-      {
-        type: 'image/png'
-      }
+      { type: 'image/png' }
     );
 
   }
