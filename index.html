@@ -243,15 +243,15 @@
 
         <p>
 
-          <label for="name">
-            Name
+          <label for="vorname">
+            Vorname
           </label>
 
           <input
-            id="name"
-            name="name"
+            id="vorname"
+            name="vorname"
             type="text"
-            autocomplete="name"
+            autocomplete="given-name"
             required
           />
 
@@ -260,22 +260,34 @@
 
         <p>
 
-          <label for="email">
-
-            E-Mail
-
-            <span class="opt">
-              (optional)
-            </span>
-
+          <label for="nachname">
+            Nachname
           </label>
 
+          <input
+            id="nachname"
+            name="nachname"
+            type="text"
+            autocomplete="family-name"
+            required
+          />
+
+        </p>
+
+
+        <p>
+
+          <label for="lieblingslied">
+            Lieblingslied
+          </label>
 
           <input
-            id="email"
-            name="email"
-            type="email"
-            autocomplete="email"
+            id="lieblingslied"
+            name="lieblingslied"
+            type="text"
+            autocomplete="off"
+            placeholder="Titel – Interpret"
+            required
           />
 
         </p>
@@ -302,7 +314,7 @@
 
 
       <!-- ===================================================
-           SCHRITT 2 – MITBRINGEN
+           SCHRITT 2 – WIE LANGE BIST DU DABEI
            =================================================== -->
 
       <fieldset
@@ -354,7 +366,9 @@
 
             Bemerkungen
 
-            <span class="opt">
+            <span
+              class="opt"
+              id="remarks-hint">
               (optional)
             </span>
 
@@ -425,7 +439,7 @@
       </canvas>
 
 
-      <p>
+      <p class="actions">
 
 
         <button
