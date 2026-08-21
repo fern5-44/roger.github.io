@@ -34,6 +34,7 @@ const COLUMNS = [
   'nachname',
   'name',
   'lieblingslied',
+  'zutat'
   'choices',
   'choiceText',
   'remarks',
@@ -76,6 +77,7 @@ function submit(e, p) {
       nachname,
       String(p.name || (vorname + ' ' + nachname)).trim(),
       String(p.lieblingslied || '').trim(),
+      String(p.zutat || '').trim(),
       wanted.join(','),
       text,
       String(p.remarks || '').trim(),
