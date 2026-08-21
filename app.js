@@ -66,7 +66,7 @@ const OPTIONS = [
 const CHECKLIST = [
   'Schlittschuhe',
   'Zugticket (bis is Lerchefeld und den zu mir hei)',
-  'Wetter entsprechendi Kleidig (Bi Schnee chunt dSarah uf lustigi Idee)
+  'Wetter entsprechendi Kleidig (Bi Schnee chunt dSarah uf lustigi Idee),
   'Fall übernachtisch snöstigste zum Schlofe (Decki & Chüssi hemmer)
 ];
 
@@ -114,22 +114,22 @@ function validateSecurityQuestions() {
 
 
   if (!q1 || !q2 || !q3) {
-    return 'Bitte beantworte alle drei Fragen.';
+    return 'Beantworte alle drü Frage richtig zum witer cho.';
   }
 
 
   if (q1.value !== SECURITY_ANSWERS.question1) {
-    return 'Frage 1 ist falsch. Versuch es noch einmal.';
+    return 'Frage 1 ist falsch. Tipp: Vo Rechts nach Links lese.';
   }
 
 
   if (q2.value !== SECURITY_ANSWERS.question2) {
-    return 'Frage 2 ist falsch. Versuch es noch einmal.';
+    return 'Frage 2 ist falsch. Probiers nomol.';
   }
 
 
   if (q3.value !== SECURITY_ANSWERS.question3) {
-    return 'Frage 3 ist falsch. Versuch es noch einmal.';
+    return 'Frage 3 ist falsch. Für die meiste eher chli und unscheinbar.';
   }
 
 
@@ -592,17 +592,17 @@ if (!form) {
     if (i === 1) {
 
       if (!$('#vorname').value.trim()) {
-        return 'Bitte den Vornamen eintragen.';
+        return 'Din Vorname:';
       }
 
 
       if (!$('#nachname').value.trim()) {
-        return 'Bitte den Nachnamen eintragen.';
+        return 'Din Nachname:';
       }
 
 
       if (!$('#lieblingslied').value.trim()) {
-        return 'Bitte ein Lieblingslied eintragen.';
+        return 'Din Lieblingssong:';
       }
 
 
@@ -622,7 +622,7 @@ if (!form) {
         !getChoices().length
       ) {
 
-        return 'Bitte eine Option ankreuzen.';
+        return 'Bitte ankreuze:';
 
       }
 
