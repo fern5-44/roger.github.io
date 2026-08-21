@@ -880,13 +880,6 @@ if (!form) {
           }
         );
 
-
-      if (canShareFiles()) {
-
-        $('#share').hidden = false;
-
-      }
-
     }
   );
 
@@ -1291,65 +1284,5 @@ if (!form) {
   );
 
 
-  /* =======================================================
-     TEILEN
-     ======================================================= */
-
-  $('#share').addEventListener(
-    'click',
-    async () => {
-
-      try {
-
-        await navigator.share({
-
-          title: EVENT.title,
-
-          files: [file()]
-
-        });
-
-
-      } catch (err) {
-
-        if (err.name !== 'AbortError') {
-
-          console.error(err);
-
-        }
-
-      }
-
-    }
-  );
-
-
-  function file() {
-
-    return new File(
-      [blob],
-      'einladung.png',
-      { type: 'image/png' }
-    );
-
-  }
-
-
-  function canShareFiles() {
-
-    try {
-
-      return !!navigator.canShare &&
-        navigator.canShare({
-          files: [file()]
-        });
-
-    } catch (e) {
-
-      return false;
-
-    }
-
-  }
 
 }
