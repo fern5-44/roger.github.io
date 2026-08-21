@@ -1,10 +1,18 @@
-/* Absichtlich karg – Gestaltung ist deine Baustelle. */
+/* =========================================================
+   FARBEN – dezentes Grün/Braun
+   ========================================================= */
 
 :root {
-  --ink: #16181d;
-  --muted: #6b7078;
-  --paper: #fff;
-  --line: #d9dbe0;
+  --ink: #2c2822;          /* dunkles Braun statt Schwarz */
+  --muted: #7d7566;        /* gedaempftes Braun */
+  --paper: #faf8f3;        /* warmes Papierweiss */
+  --card: #fffefb;
+  --line: #d9d2c4;         /* helle Linie, leicht beige */
+  --green: #4f6146;        /* Moosgruen */
+  --green-dark: #3d4c36;
+  --green-soft: #eef0e7;   /* sehr helles Gruen fuer Markierungen */
+  --brown: #7a6a53;
+  --error: #9b3d2e;
 }
 
 * {
@@ -13,7 +21,7 @@
 
 body {
   margin: 0;
-  font: 16px/1.5 system-ui, sans-serif;
+  font: 16px/1.6 system-ui, sans-serif;
   color: var(--ink);
   background: var(--paper);
 }
@@ -26,11 +34,21 @@ main {
 
 h1 {
   margin: 0 0 4px;
+  color: var(--green-dark);
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  color: var(--green-dark);
 }
 
 #meta,
 #progress {
   color: var(--muted);
+}
+
+#status:not(:empty) {
+  color: var(--brown);
 }
 
 fieldset {
@@ -42,8 +60,37 @@ fieldset {
 legend {
   font-size: 1.25rem;
   font-weight: 600;
+  color: var(--green-dark);
   padding: 0;
   margin-bottom: 12px;
+}
+
+/* Die Sicherheitsfragen bekommen eine leichte Abgrenzung */
+fieldset.question {
+  margin-top: 20px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--green);
+  border-radius: 6px;
+  background: var(--card);
+}
+
+fieldset.question legend {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+fieldset.question label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  cursor: pointer;
+}
+
+fieldset.question input {
+  width: auto;
+  flex: none;
+  accent-color: var(--green);
 }
 
 label {
@@ -61,27 +108,40 @@ select,
 textarea {
   width: 100%;
   font: inherit;
+  color: var(--ink);
+  background: var(--card);
   padding: 10px;
   border: 1px solid var(--line);
   border-radius: 6px;
 }
 
-/* Auswahl in Schritt 2 */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+/* Auswahl in Schritt 3 */
 .choice {
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  padding: 12px;
+  padding: 12px 14px;
   border: 1px solid var(--line);
   border-radius: 6px;
+  background: var(--card);
   margin-bottom: 8px;
   cursor: pointer;
 }
 
 .choice input {
   width: auto;
-  margin: 2px 0 0;
+  margin: 4px 0 0;
   flex: none;
+  accent-color: var(--green);
 }
 
 .choice small {
@@ -90,26 +150,55 @@ textarea {
 }
 
 .choice:has(input:checked) {
-  border-color: var(--ink);
+  border-color: var(--green);
+  background: var(--green-soft);
+  box-shadow: inset 3px 0 0 var(--green);
 }
 
-button {
+/* =========================================================
+   KNOEPFE
+   ========================================================= */
+
+button,
+.btn {
+  display: inline-block;
   font: inherit;
+  line-height: 1.5;
+  text-align: center;
+  text-decoration: none;
   padding: 11px 18px;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--green);
   border-radius: 6px;
-  background: var(--ink);
+  background: var(--green);
   color: var(--paper);
   cursor: pointer;
 }
 
-/* sekundäre Aktionen */
+button:hover,
+.btn:hover {
+  background: var(--green-dark);
+  border-color: var(--green-dark);
+}
+
+/* sekundaere Aktionen – "Termin in Kalender eintragen" sieht
+   dadurch genauso aus wie "Bild herunterladen" */
 button[data-back],
 #download,
 #share,
-#load {
-  background: var(--paper);
-  color: var(--ink);
+#load,
+a.btn {
+  background: var(--card);
+  color: var(--green-dark);
+}
+
+button[data-back]:hover,
+#download:hover,
+#share:hover,
+#load:hover,
+a.btn:hover {
+  background: var(--green-soft);
+  border-color: var(--green-dark);
+  color: var(--green-dark);
 }
 
 button:disabled {
@@ -117,8 +206,10 @@ button:disabled {
   cursor: default;
 }
 
-.nav {
+.nav,
+.actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 20px;
 }
@@ -128,16 +219,20 @@ button:disabled {
 }
 
 #error {
-  color: #b3261e;
+  color: var(--error);
+  border-left: 3px solid var(--error);
+  padding-left: 10px;
+  margin-top: 16px;
 }
 
-/* Canvas ist 1080 px breit – hier skalieren, nicht die Canvas-Größe ändern,
+/* Canvas ist 1080 px breit – hier skalieren, nicht die Canvas-Groesse aendern,
    sonst wird das heruntergeladene Bild klein. */
 #ticket {
   display: block;
   width: 100%;
   height: auto;
   border: 1px solid var(--line);
+  border-radius: 8px;
 }
 
 /* Admin-Vorschau */
@@ -158,6 +253,7 @@ td {
 
 th {
   white-space: nowrap;
+  color: var(--green-dark);
 }
 
 [hidden] {
