@@ -66,8 +66,8 @@ const OPTIONS = [
 const CHECKLIST = [
   'Schlittschuhe',
   'Zugticket (bis is Lerchefeld und den zu mir hei)',
-  'Wetter entsprechendi Kleidig (Bi Schnee chunt dSarah uf lustigi Idee),
-  'Fall übernachtisch snöstigste zum Schlofe (Decki & Chüssi hemmer)
+  'Wetter entsprechendi Kleidig (Bi Schnee chunt dSarah uf lustigi Idee)',
+  'Fall übernachtisch snöstigste zum Schlofe (Decki & Chüssi hemmer)'
 ];
 
 
