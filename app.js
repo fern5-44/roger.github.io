@@ -605,6 +605,10 @@ if (!form) {
         return 'Din Lieblingssong:';
       }
 
+        if (!$('#zutat').value.trim()) {
+        return 'Dini Lieblingszuetat uf de Pizza:';
+      }
+
 
       return null;
 
