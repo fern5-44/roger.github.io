@@ -43,18 +43,18 @@ const CHOICE_REQUIRED = true;
 const OPTIONS = [
   {
     id: 'openend',
-    label: 'Open End am Samstagabend',
-    note: 'Ich bleibe bis zum Schluss und fahre danach heim'
+    label: 'Samstigobig - Open End',
+    note: 'Nachem Znacht gits no en Spili- / Bastelobig. Es git kein offizielle Schluss, du dörfsch frei sege bis wenn du magsch blibe.'
   },
   {
     id: 'uebernachten',
-    label: 'Mit Übernachten bis Sonntag',
-    note: 'Ich bleibe über Nacht'
+    label: 'Mit Übernachte',
+    note: 'Du derfsch au sehr gern no bi mir übernachte. Am Sunntig gits au no es feins Zmorge.'
   },
   {
     id: 'anderes',
     label: 'Anderes',
-    note: 'Bitte im nächsten Schritt in die Bemerkung schreiben'
+    note: 'Falls gern würsch cho, aber nonig sicher isch öbs passt, denn schribs uf de nächste Siite doch gschwind id Bemerkige.'
   }
 ];
 
@@ -65,7 +65,9 @@ const OPTIONS = [
 
 const CHECKLIST = [
   'Schlittschuhe',
-  'Zugticket'
+  'Zugticket (bis is Lerchefeld und den zu mir hei)',
+  'Wetter entsprechendi Kleidig (Bi Schnee chunt dSarah uf lustigi Idee)
+  'Fall übernachtisch snöstigste zum Schlofe (Decki & Chüssi hemmer)
 ];
 
 
