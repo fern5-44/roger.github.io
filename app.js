@@ -4,9 +4,9 @@
 
 const EVENT = {
   title: 'Särli feiert Geburtstag',
-  date: 'Sa, Januar 2027',
-  time: '19:00 Uhr',
-  place: 'Gartenhaus',
+  date: 'Sa 09 - So 10, Januar 2027',
+  time: '14:00 Uhr',
+  place: 'St.Gallen Bahnhof (47.42325928890625, 9.370972681293138)',
 };
 
 
@@ -43,8 +43,8 @@ const CHOICE_REQUIRED = true;
 const OPTIONS = [
   {
     id: 'openend',
-    label: 'Samstigobig - Open End',
-    note: 'Nachem Znacht gits no en Spili- / Bastelobig. Es git kein offizielle Schluss, du dörfsch frei sege bis wenn du magsch blibe.'
+    label: 'Samstig - Open End',
+    note: 'Nachem Znacht gits no en Spili- / Bastelobig + en Film. Es git kein offizielle Schluss, du dörfsch frei sege bis wenn du magsch blibe.'
   },
   {
     id: 'uebernachten',
@@ -64,8 +64,9 @@ const OPTIONS = [
    ========================================================= */
 
 const CHECKLIST = [
-  'Schlittschuhe',
-  'Zugticket (bis is Lerchefeld und den zu mir hei)',
+  'Sportkleider (Indoorsport)',
+  'Falls häsch, Kletterschuhe',
+  'Zugticket',
   'Wetter entsprechendi Kleidig (Bi Schnee chunt dSarah uf lustigi Idee)',
   'Fall übernachtisch snöstigste zum Schlofe (Decki & Chüssi hemmer)'
 ];
