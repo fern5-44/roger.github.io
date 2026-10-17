@@ -80,7 +80,7 @@ const CHECKLIST = [
    ========================================================= */
 
 const CHECKLIST_NOTE =
-  'Bezüglich Gschenkli, fühl dich nöd verpflichtet was zschenke. SGrösste Gschänk für mi isch wenn du as Feschtli chunsch :). I schenke amel au mega gern öppis, falls dir glich goht aber du nöd weisch was, den chasch au gern öppis für de Zmorge biistüre. Schrib mo denn doch gschwind, was bringe möchtisch, nöd das mo denn dSache doppelt hend ;);
+  'Bezüglich Gschenkli, fühl dich nöd verpflichtet was zschenke. SGrösste Gschänk für mi isch wenn du as Feschtli chunsch :). I schenke amel au mega gern öppis, falls dir glich goht aber du nöd weisch was, den chasch au gern öppis für de Zmorge biistüre. Schrib mo denn doch gschwind, was bringe möchtisch, nöd das mo denn dSache doppelt hend ;)';
 
 
 /* =========================================================
@@ -1003,6 +1003,26 @@ if (!form) {
 
     const ctx = canvas.getContext('2d');
 
+
+    /* Kommentar vorab messen: das Bild wird so viel höher,
+       wie der Kommentar braucht. */
+
+    ctx.font =
+      'italic 400 28px system-ui, sans-serif';
+
+    const noteLines =
+      CHECKLIST_NOTE
+        ? wrap(ctx, CHECKLIST_NOTE, canvas.width - 200, 12)
+        : [];
+
+    const NOTE_BLOCK =
+      noteLines.length
+        ? 40 + noteLines.length * 38
+        : 0;
+
+    canvas.height = 1350 + NOTE_BLOCK;
+
+
     const W = canvas.width;
     const H = canvas.height;
 
@@ -1121,13 +1141,6 @@ if (!form) {
         ([, value]) =>
           wrap(ctx, String(value || '–'), CW, 2)
       );
-
-
-    /* Platz fuer den Kommentar unter der Checkliste
-       (nur wenn ein Kommentar eingetragen ist). */
-
-    const NOTE_BLOCK =
-      CHECKLIST_NOTE ? 130 : 0;
 
 
     const TOP = 400;
@@ -1264,7 +1277,7 @@ if (!form) {
       ctx.fillStyle = BROWN;
 
 
-      wrap(ctx, CHECKLIST_NOTE, CW, 3).forEach(
+      noteLines.forEach(
         (line, idx) => {
 
           ctx.fillText(line, M, y + 10 + idx * 38);
