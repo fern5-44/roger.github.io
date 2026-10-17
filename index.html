@@ -8,6 +8,67 @@
   <title>Anmeldung</title>
 
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Tipp-Styles -->
+  <style>
+    .tipp-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.9em;
+      height: 1.9em;
+      margin-right: .5em;
+      padding: 0;
+      border: 1px solid #d9c98a;
+      border-radius: 50%;
+      background: #fff6cf;
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+      vertical-align: middle;
+    }
+
+    .tipp-btn:hover,
+    .tipp-btn[aria-expanded="true"] {
+      background: #ffeb99;
+    }
+
+    .tipp-box {
+      position: relative;
+      margin: .5em 0 1em;
+      padding: .8em 2.6em .8em 1em;
+      border: 1px solid #d9c98a;
+      border-radius: 8px;
+      background: #fff6cf;
+    }
+
+    .tipp-box[hidden] {
+      display: none;
+    }
+
+    .tipp-box p {
+      margin: 0;
+    }
+
+    .tipp-close {
+      position: absolute;
+      top: .4em;
+      right: .4em;
+      width: 2em;
+      height: 2em;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .tipp-close:hover {
+      background: rgba(0, 0, 0, .08);
+    }
+  </style>
 </head>
 
 
@@ -65,8 +126,24 @@
         <fieldset class="question">
 
           <legend>
-            Frage 1: Wie alt werde ich?
+            <button
+              type="button"
+              class="tipp-btn"
+              data-tipp="tipp1"
+              aria-label="Tipp anzeigen"
+              aria-expanded="false"
+              aria-controls="tipp1">💡</button>Frage 1: Wie alt werde ich?
           </legend>
+
+          <!-- TIPP 1: Text hier eintragen -->
+          <div class="tipp-box" id="tipp1" hidden>
+            <p>Hier kommt der Tipp zu Frage 1.</p>
+            <button
+              type="button"
+              class="tipp-close"
+              data-tipp-close="tipp1"
+              aria-label="Tipp schliessen">✕</button>
+          </div>
 
 
           <label>
@@ -116,8 +193,24 @@
         <fieldset class="question">
 
           <legend>
-            Frage 2: Welche Zutat kommt nicht auf eine Pizza?
+            <button
+              type="button"
+              class="tipp-btn"
+              data-tipp="tipp2"
+              aria-label="Tipp anzeigen"
+              aria-expanded="false"
+              aria-controls="tipp2">💡</button>Frage 2: Welche Zutat kommt nicht auf eine Pizza?
           </legend>
+
+          <!-- TIPP 2: Text hier eintragen -->
+          <div class="tipp-box" id="tipp2" hidden>
+            <p>Hier kommt der Tipp zu Frage 2.</p>
+            <button
+              type="button"
+              class="tipp-close"
+              data-tipp-close="tipp2"
+              aria-label="Tipp schliessen">✕</button>
+          </div>
 
 
           <label>
@@ -167,8 +260,24 @@
         <fieldset class="question">
 
           <legend>
-            Frage 3: Was sind meine Lieblingsblumen?
+            <button
+              type="button"
+              class="tipp-btn"
+              data-tipp="tipp3"
+              aria-label="Tipp anzeigen"
+              aria-expanded="false"
+              aria-controls="tipp3">💡</button>Frage 3: Was sind meine Lieblingsblumen?
           </legend>
+
+          <!-- TIPP 3: Text hier eintragen -->
+          <div class="tipp-box" id="tipp3" hidden>
+            <p>Hier kommt der Tipp zu Frage 3.</p>
+            <button
+              type="button"
+              class="tipp-close"
+              data-tipp-close="tipp3"
+              aria-label="Tipp schliessen">✕</button>
+          </div>
 
 
           <label>
@@ -489,6 +598,29 @@
        ===================================================== -->
 
   <script src="app.js"></script>
+
+  <!-- Tipp auf-/zuklappen -->
+  <script>
+    document.addEventListener("click", function (e) {
+      var open = e.target.closest("[data-tipp]");
+      var close = e.target.closest("[data-tipp-close]");
+
+      if (open) {
+        var box = document.getElementById(open.dataset.tipp);
+        var show = box.hidden;
+        box.hidden = !show;
+        open.setAttribute("aria-expanded", show ? "true" : "false");
+      }
+
+      if (close) {
+        var box2 = document.getElementById(close.dataset.tippClose);
+        var btn = document.querySelector('[data-tipp="' + close.dataset.tippClose + '"]');
+        box2.hidden = true;
+        btn.setAttribute("aria-expanded", "false");
+        btn.focus();
+      }
+    });
+  </script>
 
 </body>
 
