@@ -1006,6 +1006,12 @@ if (!form) {
     img.src = (data.choiceText || '').includes('Open End')
       ? 'flyer-ohne-uebernachten.png'
       : 'flyer.png';
+
+    /* Kalender: ohne Übernachten nur bis 23 Uhr */
+    if ((data.choiceText || '').includes('Open End')) {
+      const cal = document.querySelector('a[href*="Meine_Termine"]');
+      cal.href = cal.href.replace('Meine_Termine.ics', 'Meine_Termine_ohne_uebernachten.ics');
+    }
     await img.decode();
 
     canvas.width = img.naturalWidth;
