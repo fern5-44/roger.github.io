@@ -41,6 +41,7 @@ const COLUMNS = [
   'choices',
   'choiceText',
   'remarks',
+  'funfact',
 ];
 
 function doGet(e) {
@@ -78,6 +79,7 @@ function submit(e, p) {
     const lieblingslied = String(p.lieblingslied || '').trim();
     const zutat = String(p.zutat || '').trim();
     const remarks = String(p.remarks || '').trim();
+    const funfact = String(p.funfact || '').trim();
 
     sheet().appendRow([
       new Date(),
@@ -89,6 +91,7 @@ function submit(e, p) {
       wanted.join(','),
       text,
       remarks,
+      funfact,
     ]);
 
     /* Mail an dich. Ein Fehler hier darf die Anmeldung nicht
@@ -100,6 +103,7 @@ function submit(e, p) {
         lieblingslied: lieblingslied,
         zutat: zutat,
         remarks: remarks,
+        funfact: funfact,
       });
     } catch (mailErr) {
       console.error('Mail fehlgeschlagen: ' + mailErr);
@@ -120,6 +124,7 @@ function sendeMail_(d) {
     'Name: '          + (d.name          || '-') + '\n' +
     'Bleibt: '        + (d.choiceText    || '-') + '\n' +
     'Lieblingslied: ' + (d.lieblingslied || '-') + '\n' +
+    'Funfact: '       + (d.funfact       || '-') + '\n' +
     'Pizza-Zutat: '   + (d.zutat         || '-') + '\n' +
     'Bemerkung: '     + (d.remarks       || '-') + '\n';
 
