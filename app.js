@@ -617,6 +617,10 @@ if (!form) {
         return 'Din Lieblingssong:';
       }
 
+      if (!$('#funfact').value.trim()) {
+        return 'En Funfact über dich:';
+      }
+
       if (!$('#zutat').value.trim()) {
         return 'Dini Lieblingszuetat uf de Pizza:';
       }
@@ -786,6 +790,9 @@ if (!form) {
 
         lieblingslied:
           $('#lieblingslied').value.trim(),
+
+        funfact:
+          $('#funfact').value.trim(),
 
         zutat:
           $('#zutat').value.trim(),
@@ -994,312 +1001,16 @@ if (!form) {
 
   async function drawTicket(canvas, data) {
 
-    try {
-
-      await document.fonts.ready;
-
-    } catch (e) {}
-
-
-    const ctx = canvas.getContext('2d');
-
-
-    /* Kommentar vorab messen: das Bild wird so viel höher,
-       wie der Kommentar braucht. */
-
-    ctx.font =
-      'italic 400 28px system-ui, sans-serif';
-
-    const noteLines =
-      CHECKLIST_NOTE
-        ? wrap(ctx, CHECKLIST_NOTE, canvas.width - 200, 12)
-        : [];
-
-    const NOTE_BLOCK =
-      noteLines.length
-        ? 40 + noteLines.length * 38
-        : 0;
-
-    canvas.height = 1350 + NOTE_BLOCK;
-
-
-    const W = canvas.width;
-    const H = canvas.height;
-
-    const M = 100;
-    const CW = W - M * 2;
-
-
-    /* --- Farben, passend zur Seite --- */
-    const PAPER = '#faf8f3';
-    const INK = '#2c2822';
-    const GREEN = '#4f6146';
-    const GREEN_DARK = '#3d4c36';
-    const BROWN = '#8a7f6a';
-    const LINE = '#d9d2c4';
-
-
-    /* --- Untergrund --- */
-
-    ctx.fillStyle = PAPER;
-
-    ctx.fillRect(0, 0, W, H);
-
-
-    /* --- Gruener Balken oben --- */
-
-    ctx.fillStyle = GREEN;
-
-    ctx.fillRect(0, 0, W, 16);
-
-
-    /* --- Feiner Rahmen --- */
-
-    ctx.strokeStyle = LINE;
-
-    ctx.lineWidth = 2;
-
-    ctx.strokeRect(40, 46, W - 80, H - 86);
-
-
-    ctx.textBaseline = 'alphabetic';
-
-
-    /* --- Titel --- */
-
-    const titleSize =
-      fitFont(ctx, EVENT.title, CW, 78, '700');
-
-    ctx.font =
-      `700 ${titleSize}px system-ui, sans-serif`;
-
-    ctx.fillStyle = GREEN_DARK;
-
-    ctx.fillText(EVENT.title, M, 200);
-
-
-    /* --- Name --- */
-
-    const nameSize =
-      fitFont(ctx, data.name || 'Gast', CW, 44, '400');
-
-    ctx.font =
-      `400 ${nameSize}px system-ui, sans-serif`;
-
-    ctx.fillStyle = INK;
-
-    ctx.fillText(data.name || 'Gast', M, 262);
-
-
-    /* --- Trennlinie --- */
-
-    ctx.strokeStyle = LINE;
-
-    ctx.lineWidth = 2;
-
-    ctx.beginPath();
-
-    ctx.moveTo(M, 306);
-
-    ctx.lineTo(W - M, 306);
-
-    ctx.stroke();
-
-
-    /* --- Zusammenfassung --- */
-
-    const rows = [
-
-      [
-        'Wann',
-        `${EVENT.date} · ${EVENT.time}`
-      ],
-
-      [
-        'Wo',
-        EVENT.place
-      ],
-
-      [
-        'Du bleibst',
-        data.choiceText ||
-        '–'
-      ],
-
-    ];
-
-
-    /* Erst messen, dann setzen: so bleibt der Abstand stimmig,
-       egal ob ein Liedtitel kurz ist oder ueber zwei Zeilen geht. */
-
-    ctx.font =
-      '500 36px system-ui, sans-serif';
-
-
-    const wrapped =
-      rows.map(
-        ([, value]) =>
-          wrap(ctx, String(value || '–'), CW, 2)
-      );
-
-
-    const TOP = 400;
-    const FOOT = 150;
-    const CHECK_BLOCK =
-      106 + CHECKLIST.length * 70 + NOTE_BLOCK;
-
-
-    const textHeight =
-      wrapped.reduce(
-        (sum, lines) => sum + 46 + lines.length * 44,
-        0
-      );
-
-
-    let gap =
-      Math.round(
-        (H - FOOT - TOP - textHeight - CHECK_BLOCK) /
-        rows.length
-      );
-
-
-    gap = Math.max(22, Math.min(46, gap));
-
-
-    let y = TOP;
-
-
-    rows.forEach(
-      ([label], index) => {
-
-        ctx.font =
-          '600 24px system-ui, sans-serif';
-
-        ctx.fillStyle = BROWN;
-
-        ctx.fillText(
-          label.toUpperCase(),
-          M,
-          y
-        );
-
-
-        ctx.font =
-          '500 36px system-ui, sans-serif';
-
-        ctx.fillStyle = INK;
-
-
-        const lines = wrapped[index];
-
-
-        lines.forEach(
-          (line, idx) => {
-
-            ctx.fillText(
-              line,
-              M,
-              y + 46 + idx * 44
-            );
-
-          }
-        );
-
-
-        y += 46 + lines.length * 44 + gap;
-
-      }
-    );
-
-
-    /* --- Trennlinie --- */
-
-    ctx.strokeStyle = LINE;
-
-    ctx.beginPath();
-
-    ctx.moveTo(M, y);
-
-    ctx.lineTo(W - M, y);
-
-    ctx.stroke();
-
-
-    y += 76;
-
-
-    /* --- Checkliste --- */
-
-    ctx.font =
-      '700 40px system-ui, sans-serif';
-
-    ctx.fillStyle = GREEN_DARK;
-
-    ctx.fillText('Bitte mitbringen', M, y);
-
-
-    y += 30;
-
-
-    CHECKLIST.forEach(
-      (thing) => {
-
-        /* Kaestchen zum Abhaken */
-
-        ctx.strokeStyle = GREEN;
-
-        ctx.lineWidth = 2;
-
-        ctx.strokeRect(M, y, 21, 21);
-
-
-        ctx.font =
-          '200 18px system-ui, sans-serif';
-
-        ctx.fillStyle = INK;
-
-        ctx.fillText(thing, M + 56, y + 28);
-
-
-        y += 70;
-
-      }
-    );
-
-
-    /* --- Kommentar unter der Checkliste --- */
-
-    if (CHECKLIST_NOTE) {
-
-      ctx.font =
-        'italic 400 28px system-ui, sans-serif';
-
-      ctx.fillStyle = BROWN;
-
-
-      noteLines.forEach(
-        (line, idx) => {
-
-          ctx.fillText(line, M, y + 10 + idx * 38);
-
-        }
-      );
-
-    }
-
-
-    /* --- Fusszeile --- */
-
-    ctx.font =
-      '400 26px system-ui, sans-serif';
-
-    ctx.fillStyle = BROWN;
-
-    ctx.fillText(
-      'Bis bald – ich freue mich auf dich!',
-      M,
-      H - 96
-    );
+    /* Der Flyer ist ein fertiges Bild (flyer.png im Repo). */
+    const img = new Image();
+    img.src = (data.choiceText || '').includes('Open End')
+      ? 'flyer-ohne-uebernachten.png'
+      : 'flyer.png';
+    await img.decode();
+
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    canvas.getContext('2d').drawImage(img, 0, 0);
 
   }
 
