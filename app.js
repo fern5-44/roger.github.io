@@ -29,7 +29,7 @@ const EVENT = {
    ========================================================= */
 
 const ENDPOINT =
-  'https://script.google.com/macros/s/AKfycbwpiKI0KTew2TdgcO1_k4WA1-syOZBT309YuQTD4ibTVxJvJa4UPaV-6vRhhEE4tAdU/exec';
+  'https://script.google.com/macros/s/AKfycbzXwd0mBFNSOh1666upWrSf84h3yzWjc5Avk7XohSTVmhBGYC5G5sulDuYiQCexkRqM/exec';
 
 
 /* =========================================================
