@@ -168,10 +168,7 @@ if (!form) {
     $('#title').textContent = EVENT.title;
   }
 
-  if ($('#meta')) {
-    $('#meta').textContent =
-      `${EVENT.date}, ${EVENT.time} · ${EVENT.place}`;
-  }
+  
 
   if ($('#choice-title')) {
     $('#choice-title').textContent = CHOICE_TITLE;
