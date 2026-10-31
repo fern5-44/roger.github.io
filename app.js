@@ -3,7 +3,7 @@
    ========================================================= */
 
 const EVENT = {
-  title: 'Särli feiert Geburtstag',
+  title: 'Särli feiert Geburtstag'
   
 };
 
