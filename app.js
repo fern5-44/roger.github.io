@@ -998,9 +998,7 @@ if (!form) {
 
     /* Der Flyer ist ein fertiges Bild (flyer.png im Repo). */
     const img = new Image();
-    img.src = (data.choiceText || '').includes('Open End')
-      ? 'flyer-ohne-uebernachten.png'
-      : 'flyer.png';
+       img.src = 'flyer.png';
 
     /* Kalender: ohne Übernachten nur bis 23 Uhr */
     if ((data.choiceText || '').includes('Open End')) {
