@@ -42,12 +42,12 @@ const OPTIONS = [
   {
     id: 'openend',
     label: 'Samstig - Open End',
-    note: 'Nachem Znacht gits no en Spili- / Bastelobig + en Film. Es git kein offizielle Schluss, du dörfsch frei sege bis wenn du magsch blibe.'
+    note: 'Es git kein offizielle Schluss, du dörfsch frei sege bis wenn du magsch blibe. Schrib mir die ungefähr Ziit id Bemerkig uf de nächste Site.'
   },
   {
     id: 'uebernachten',
     label: 'Mit Übernachte',
-    note: 'Du derfsch au sehr gern no bi mir übernachte. Am Sunntig gits au no es feins Zmorge.'
+    note: 'Am Sunntig gots so bis am Mittag.'
   },
   {
     id: 'anderes',
@@ -62,9 +62,9 @@ const OPTIONS = [
    ========================================================= */
 
 const CHECKLIST = [
-  'Sportkleider (Indoorsport)',
-  'Falls häsch, Kletterschuhe',
-  'Zugticket',
+  'Sportkleider (Indoorsport) + Flasche',
+  'Kletterschuhe (Miete möglich: 5Fr.)',
+  'Zugticket uf St.Gallen und den zu mir hei',
   'Wetter entsprechendi Kleidig (Bi Schnee chunt dSarah uf lustigi Idee)',
   'Fall übernachtisch snöstigste zum Schlofe (Decki & Chüssi hemmer)'
 ];
