@@ -124,12 +124,12 @@ function validateSecurityQuestions() {
 
 
   if (!q1 || !q2 || !q3) {
-    return 'Beantworte alle drü Frage richtig zum witer cho.';
+    return 'Beantworte alli drü Frage richtig zum witer cho';
   }
 
 
   if (q1.value !== SECURITY_ANSWERS.question1) {
-    return 'Frage 1 ist falsch. Tipp: Vo Rechts nach Links lese.';
+   return 'Frage 1 ist falsch. Tipp: Fang rechts aa zelle.';
   }
 
 
