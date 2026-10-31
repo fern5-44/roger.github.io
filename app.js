@@ -4,9 +4,7 @@
 
 const EVENT = {
   title: 'Särli feiert Geburtstag',
-  date: 'Sa 09 - So 10, Januar 2027',
-  time: '14:00 Uhr',
-  place: 'St.Gallen Bahnhof (47.42325928890625, 9.370972681293138)',
+  
 };
 
 
