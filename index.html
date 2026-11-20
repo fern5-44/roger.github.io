@@ -647,6 +647,37 @@
     });
   </script>
 
+    <!-- Konfetti beim Laden der Seite -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script>
+    (function () {
+      // Leute, die Animationen im System ausgeschaltet haben, bekommen keins
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      // Pastell-Palette: Rosé, Pfirsich, Vanille, Salbei, Himmelblau, Lavendel
+      var farben = ["#f4c2c9", "#f9d5bb", "#f5e6b8", "#c5dcc2", "#bcd3e6", "#d6c5e6"];
+      var ende = Date.now() + 3500;
+
+      (function regnen() {
+        confetti({
+          particleCount: 3,
+          angle: 270,
+          spread: 70,
+          startVelocity: 6,
+          gravity: 0.55,
+          drift: (Math.random() - 0.5) * 0.6,
+          ticks: 500,
+          scalar: 0.9,
+          shapes: ["square", "circle"],
+          colors: farben,
+          origin: { x: Math.random(), y: -0.1 }
+        });
+        if (Date.now() < ende) requestAnimationFrame(regnen);
+      })();
+    })();
+  </script>
+
+
 </body>
 
 </html>
