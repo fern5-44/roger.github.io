@@ -656,7 +656,7 @@
 
       // Pastell-Palette: Rosé, Pfirsich, Vanille, Salbei, Himmelblau, Lavendel
       var farben = ["#f4c2c9", "#f9d5bb", "#f5e6b8", "#c5dcc2", "#bcd3e6", "#d6c5e6"];
-      var ende = Date.now() + 3500;
+      var ende = Date.now() + 2000;
 
       (function regnen() {
         confetti({
@@ -666,7 +666,7 @@
           startVelocity: 6,
           gravity: 0.55,
           drift: (Math.random() - 0.5) * 0.6,
-          ticks: 500,
+          ticks: 160,
           scalar: 0.9,
           shapes: ["square", "circle"],
           colors: farben,
